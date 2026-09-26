@@ -4,6 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <!-- Run through VSTest (xunit.runner.visualstudio) so `dotnet test` works on the .NET 10 SDK
+         without a global.json opt-in to Microsoft.Testing.Platform. -->
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
   </PropertyGroup>
 
   <ItemGroup>
