@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mra.Application\Mra.Application.csproj" />
+    <ProjectReference Include="..\Mra.Infrastructure\Mra.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
