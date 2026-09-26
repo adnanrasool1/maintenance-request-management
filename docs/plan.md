@@ -166,10 +166,10 @@ Every feature below consists of a command or query, a validator, a manual mapper
   - [ ] **T6.3** `POST /api/org/sites`: site names are unique within the organisation. (FR-2.4)
   - [ ] **T6.4** `PUT /api/org/threshold`: the value must be 0 or more. TenantAdmin only. (FR-2.5)
   - [ ] **T6.5** `GET /api/sites`: any member of the organisation. (FR-2.6)
-- [ ] **T8 Spend report** · `feat/{date}/spend-report`
-  - [ ] **T8.1** Validate that `from ≤ to`, with both dates inclusive and in UTC. (FR-6.2)
-  - [ ] **T8.2** Sum `ActualCost` of `Completed` requests by site, including sites with zero spend. The grouping and summing must run in SQL. (FR-6.2, FR-6.3)
-  - [ ] **T8.3** Add the endpoint with the ApproverOrTenantAdmin policy. (FR-6.1)
+- [X] **T8 Spend report** · `feat/{date}/spend-report`
+  - [X] **T8.1** Validate that `from ≤ to`, with both dates inclusive and in UTC. (FR-6.2)
+  - [X] **T8.2** Sum `ActualCost` of `Completed` requests by site, including sites with zero spend. The grouping and summing must run in SQL. (FR-6.2, FR-6.3)
+  - [X] **T8.3** Add the endpoint with the ApproverOrTenantAdmin policy. (FR-6.1)
 
 ### Lane A — Request workflow (Dev 1)
 
