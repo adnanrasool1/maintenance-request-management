@@ -68,12 +68,12 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
     - one `SaveChanges` per command
   - [X] Add `.claude/settings.json` with the deny rules from Git rules §9.
   - [X] Create `docs/AI-LOG.md` with a working-notes section. Every developer logs their prompts and agent mistakes here as they go.
-- [ ] **T0.3 Backend skeleton** · `chore/{date}/backend-skeleton`
-  - [ ] Create `MaintenanceApprovals.slnx` with `Mra.Domain`, `Mra.Application`, `Mra.Infrastructure`, `Mra.Api`, `Mra.DbMigrator`, `Mra.Domain.Tests` and `Mra.Api.IntegrationTests`.
-  - [ ] Add project references so dependencies only point inward.
-  - [ ] Add `Directory.Build.props`: nullable enabled, warnings as errors, NuGet audit on.
-  - [ ] Add `Directory.Packages.props` with pinned versions: MediatR 12.5.0, FluentValidation, EF Core 10, xUnit, Testcontainers.
-  - [ ] The empty solution builds and the empty test run passes.
+- [X] **T0.3 Backend skeleton** · `chore/{date}/backend-skeleton`
+  - [X] Create `MaintenanceApprovals.slnx` with `Mra.Domain`, `Mra.Application`, `Mra.Infrastructure`, `Mra.Api`, `Mra.DbMigrator`, `Mra.Domain.Tests` and `Mra.Api.IntegrationTests`.
+  - [X] Add project references so dependencies only point inward.
+  - [X] Add `Directory.Build.props`: nullable enabled, warnings as errors, NuGet audit on.
+  - [X] Add `Directory.Packages.props` with pinned versions: MediatR 12.5.0, FluentValidation, EF Core 10, xUnit, Testcontainers.
+  - [X] The empty solution builds and the empty test run passes.
 - [ ] **T0.4 Frontend skeleton** · `chore/{date}/frontend-skeleton`
   - [ ] Create an Angular 22 app with standalone components and routing, and no UI library.
   - [ ] Add `proxy.conf.json` so `/api` goes to the local API when using `ng serve`.
