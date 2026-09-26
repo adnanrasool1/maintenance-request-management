@@ -92,7 +92,7 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
 ### Lane A — Domain (Dev 1)
 
 - [ ] **T1 Domain model** · `feat/{date}/domain-model`
-  - [ ] **T1.1** Add the entities `Organisation`, `Site`, `User`, `MaintenanceRequest` and `AuditEntry`, and the enums `Role` and `RequestStatus`. **Merge this first, because Lane B is waiting on it.**
+  - [X] **T1.1** Add the entities `Organisation`, `Site`, `User`, `MaintenanceRequest` and `AuditEntry`, and the enums `Role` and `RequestStatus`. **Merge this first, because Lane B is waiting on it.**
   - [ ] **T1.2** Add the transition table: one static map of allowed `from → to` transitions.
   - [ ] **T1.3** Add `Raise()` with threshold routing (below the threshold → `Approved`; at or above → `PendingApproval`). On automatic approval, store `ThresholdAtDecision` (FR-4.2).
   - [ ] **T1.4** Add `Approve()` and `Reject()`, including the self-approval check and an optional comment on both (FR-3.4). `Approve()` stores the threshold in force at that moment as `ThresholdAtDecision` (FR-4.2).
