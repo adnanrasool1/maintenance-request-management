@@ -91,15 +91,15 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
 
 ### Lane A — Domain (Dev 1)
 
-- [ ] **T1 Domain model** · `feat/{date}/domain-model`
+- [X] **T1 Domain model** · `feat/{date}/domain-model`
   - [X] **T1.1** Add the entities `Organisation`, `Site`, `User`, `MaintenanceRequest` and `AuditEntry`, and the enums `Role` and `RequestStatus`. **Merge this first, because Lane B is waiting on it.**
-  - [ ] **T1.2** Add the transition table: one static map of allowed `from → to` transitions.
-  - [ ] **T1.3** Add `Raise()` with threshold routing (below the threshold → `Approved`; at or above → `PendingApproval`). On automatic approval, store `ThresholdAtDecision` (FR-4.2).
-  - [ ] **T1.4** Add `Approve()` and `Reject()`, including the self-approval check and an optional comment on both (FR-3.4). `Approve()` stores the threshold in force at that moment as `ThresholdAtDecision` (FR-4.2).
-  - [ ] **T1.5** Add `Complete()`, which takes the actual cost, sets `CompletedAt`, and sets `ExceededThreshold` when there is an overrun.
-  - [ ] **T1.6** Make every transition method append an `AuditEntry`. `AuditEntry` has no public setters.
-  - [ ] **T1.7** Add the domain exceptions: `InvalidTransitionException` (→ 409) and `SelfApprovalException` (→ 403).
-  - [ ] **T1.8** Write unit tests:
+  - [X] **T1.2** Add the transition table: one static map of allowed `from → to` transitions.
+  - [X] **T1.3** Add `Raise()` with threshold routing (below the threshold → `Approved`; at or above → `PendingApproval`). On automatic approval, store `ThresholdAtDecision` (FR-4.2).
+  - [X] **T1.4** Add `Approve()` and `Reject()`, including the self-approval check and an optional comment on both (FR-3.4). `Approve()` stores the threshold in force at that moment as `ThresholdAtDecision` (FR-4.2).
+  - [X] **T1.5** Add `Complete()`, which takes the actual cost, sets `CompletedAt`, and sets `ExceededThreshold` when there is an overrun.
+  - [X] **T1.6** Make every transition method append an `AuditEntry`. `AuditEntry` has no public setters.
+  - [X] **T1.7** Add the domain exceptions: `InvalidTransitionException` (→ 409) and `SelfApprovalException` (→ 403).
+  - [X] **T1.8** Write unit tests:
     - every illegal transition is rejected
     - a cost exactly equal to the threshold requires approval
     - self-approval is blocked
@@ -131,12 +131,12 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
 ### Lane C — Auth and API plumbing (Dev 3)
 
 - [ ] **T3 Platform** · `feat/{date}/auth-api-plumbing`
-  - [ ] **T3.1** Register MediatR 12.5.0 and add a `ValidationBehavior` backed by FluentValidation.
-  - [ ] **T3.2** Add the `IExceptionHandler` that maps exceptions to ProblemDetails (400, 401, 403, 404, 409) as in architecture §4.4.
-  - [ ] **T3.3** Add JWT issuing and validation. The signing key, issuer and audience come from the environment, and startup fails if the key is missing or weak.
-  - [ ] **T3.4** Add a `PasswordHasher<T>` adapter and a `CurrentUser` implementation that reads claims only.
-  - [ ] **T3.5** Add authorization policies (SystemAdmin, TenantAdmin, Requester, Approver, ApproverOrTenantAdmin, OrgMember) and a **fallback policy that requires authentication**.
-  - [ ] **T3.6** Add the OpenAPI document and the Scalar UI, enabled in Development only.
+  - [X] **T3.1** Register MediatR 12.5.0 and add a `ValidationBehavior` backed by FluentValidation.
+  - [X] **T3.2** Add the `IExceptionHandler` that maps exceptions to ProblemDetails (400, 401, 403, 404, 409) as in architecture §4.4.
+  - [X] **T3.3** Add JWT issuing and validation. The signing key, issuer and audience come from the environment, and startup fails if the key is missing or weak.
+  - [X] **T3.4** Add a `PasswordHasher<T>` adapter and a `CurrentUser` implementation that reads claims only.
+  - [X] **T3.5** Add authorization policies (SystemAdmin, TenantAdmin, Requester, Approver, ApproverOrTenantAdmin, OrgMember) and a **fallback policy that requires authentication**.
+  - [X] **T3.6** Add the OpenAPI document and the Scalar UI, enabled in Development only.
   - [ ] **T3.7** Add the login command and endpoint. It returns the same error whether the email or the password is wrong, and it is one of the allowed uses of `IgnoreQueryFilters()`.
 
 ### Lane D — Frontend on mocks (Dev 4)
