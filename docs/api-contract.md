@@ -1,9 +1,9 @@
 # API Contract — Maintenance Request & Approval System
 
-**Status:** Draft — awaiting approval by lanes A, C, D
+**Status:** Approved and frozen, 2026-09-26, by the stakeholder on behalf of lanes A, C and D. The open questions are settled in [§6](#6-decisions-on-the-open-questions).
 **Plan task:** T0.6 · **Related:** [PRD](./PRD.md) · [Architecture §5](./architecture.md#5-api-surface)
 
-This document fixes the request and response shapes for every route in architecture §5. Once lanes A, C and D approve it, it is **frozen**: any change needs agreement from all lanes. It adds no routes beyond architecture §5. Anything that seems missing is listed under [Open questions](#6-open-questions), not added.
+This document fixes the request and response shapes for every route in architecture §5. Once lanes A, C and D approve it, it is **frozen**: any change needs agreement from all lanes. It adds no routes beyond architecture §5. The questions raised while drafting, and how the stakeholder settled them, are in [§6](#6-decisions-on-the-open-questions).
 
 ---
 
@@ -121,8 +121,8 @@ Creates an organisation together with its first Tenant Admin, in one save. **Pol
 | Field | Rules |
 |---|---|
 | `name` | Required, 1–200 characters after trimming. |
-| `approvalThreshold` | Required, ≥ 0, at most 2 decimal places, at most 1,000,000.00 (the cost cap; see [Open questions](#6-open-questions)). |
-| `adminEmail` | Required, valid email, ≤ 256 characters, unique across the system. |
+| `approvalThreshold` | Required, ≥ 0, at most 2 decimal places, at most 1,000,000.00 (the cost cap; [§6](#6-decisions-on-the-open-questions) D-4). |
+| `adminEmail` | Required, valid email, ≤ 256 characters, unique across the system ([§6](#6-decisions-on-the-open-questions) D-2). |
 | `adminPassword` | Required, 8–128 characters. |
 
 **Response `201 Created`** (no `Location` header: there is no route to read an organisation)
@@ -139,7 +139,7 @@ Creates an organisation together with its first Tenant Admin, in one save. **Pol
 }
 ```
 
-The new organisation's ID is deliberately not returned (no organisation IDs in DTOs; see [Open questions](#6-open-questions)).
+The new organisation's ID is deliberately not returned (no organisation IDs in DTOs; [§6](#6-decisions-on-the-open-questions) D-3).
 
 **Errors:** 400 (validation, including `adminEmail` already in use), 401, 403 (caller is not the System Admin).
 
@@ -159,7 +159,7 @@ Creates a Requester or Approver in the caller's organisation. **Policy:** `Tenan
 
 | Field | Rules |
 |---|---|
-| `email` | Required, valid email, ≤ 256 characters, unique across the system. |
+| `email` | Required, valid email, ≤ 256 characters, unique across the system ([§6](#6-decisions-on-the-open-questions) D-2). |
 | `password` | Required, 8–128 characters. |
 | `role` | Required. `Requester` or `Approver` only. `TenantAdmin` and `SystemAdmin` are rejected with 400. |
 
@@ -216,7 +216,7 @@ Sets the caller's organisation's approval threshold. **Policy:** `TenantAdmin`. 
 
 | Field | Rules |
 |---|---|
-| `approvalThreshold` | Required, ≥ 0, at most 2 decimal places, at most 1,000,000.00 (see [Open questions](#6-open-questions)). |
+| `approvalThreshold` | Required, ≥ 0, at most 2 decimal places, at most 1,000,000.00 ([§6](#6-decisions-on-the-open-questions) D-4). |
 
 **Response `200 OK`**
 
@@ -632,14 +632,16 @@ Returned whenever the email is unknown or the password is wrong. The body is byt
 
 ---
 
-## 6. Open questions
+## 6. Decisions on the open questions
 
-For the approving lanes to settle. Nothing here has been added to the contract beyond what is stated above.
+These came up while drafting. The stakeholder settled them on 2026-09-26, and each decision is part of the contract.
 
-1. **Policy name for "Requester, Approver" (lane C).** Architecture §4.4 has no policy named for "Requester or Approver". This contract assumes the `Requester` policy admits both roles (PRD §4: an Approver can do everything a Requester can). Confirm, or name a separate policy.
-2. **Global email uniqueness vs. query filters (lanes B, C).** Emails are unique system-wide (PRD §7), but `POST /api/org/users` is a Tenant Admin handler, which may not call `IgnoreQueryFilters()`. A pre-check through the filtered `Users` set can't see other organisations' users. How should the handler detect a duplicate so it returns 400 rather than 500 (for example, by relying on the unique index)? Note also that a 400 "email already in use" reveals that the email exists in some organisation; this seems unavoidable given the uniqueness rule.
-3. **New organisation's ID in the create-organisation response.** Omitted because `CLAUDE.md` forbids organisation IDs in DTOs, and no route would use it. Confirm that's acceptable for the System Admin.
-4. **Upper bound for the threshold.** The PRD only says ≥ 0. This contract caps it at 1,000,000.00 to match the cost cap (a threshold above the maximum cost would mean every request is auto-approved anyway). Confirm, or state another bound.
-5. **Limits the PRD doesn't define.** Organisation and site names 1–200 characters; approve/reject comments ≤ 2,000 characters; passwords 8–128 characters; emails ≤ 256 characters. Confirm; once approved they should get a line in `docs/DECISIONS.md`.
-6. **No way to read the current threshold.** Architecture §5 has no `GET` for it, so a Tenant Admin can only learn it from the response to `PUT /api/org/threshold`. Not needed by any UI screen; flagged in case a reviewer asks.
-7. **UTC timestamps on the wire (lanes B, C).** `datetime2` values read by EF Core come back with `DateTimeKind.Unspecified` and would serialise without the `Z`. The implementation needs to guarantee the `Z` (for example with a UTC value converter).
+| # | Question | Decision |
+|---|---|---|
+| D-1 | Architecture §4.4 has no policy named "Requester or Approver". | The `Requester` policy admits **both** Requester and Approver (PRD §4: an Approver can do everything a Requester can). No new policy name. |
+| D-2 | Emails are unique system-wide, but `POST /api/org/users` is a Tenant Admin handler and may not call `IgnoreQueryFilters()`, so it can't see other organisations' users. | The **unique index on `Users(Email)` is the check**. Infrastructure translates a unique-key violation on that index into a `ValidationException` on `email` (`POST /api/org/users`) or `adminEmail` (`POST /api/admin/organisations`), so the client gets **400**. No handler outside login and System Admin uses `IgnoreQueryFilters()`. The 400 reveals that the email is in use somewhere; with system-wide uniqueness that can't be avoided, and it is accepted. |
+| D-3 | The create-organisation response has no organisation ID. | Accepted. No route takes an organisation ID, so the System Admin has no use for it. |
+| D-4 | The PRD only says the threshold must be ≥ 0. | Capped at **1,000,000.00**, the same as the cost cap. A higher threshold would auto-approve every valid request anyway. |
+| D-5 | Limits the PRD doesn't define. | Accepted as written: organisation and site names 1–200 characters; approve/reject comments ≤ 2,000 characters; passwords 8–128 characters; emails ≤ 256 characters. Recorded in `docs/DECISIONS.md`. |
+| D-6 | There is no route to read the current threshold. | No change. No screen needs it. |
+| D-7 | EF Core reads `datetime2` back as `DateTimeKind.Unspecified`, which would serialise without the `Z`. | **Implementation requirement for T2:** a UTC value converter on every `DateTime` property, so every timestamp in a response ends in `Z`. |
