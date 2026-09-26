@@ -1,0 +1,32 @@
+# Secrets: only infra/.env.example is committed
+.env
+.env.*
+!.env.example
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+TestResults/
+*.trx
+coverage*/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+out-tsc/
+npm-debug.log*
+
+# IDEs and OS
+.vs/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Claude Code: keep settings.json, ignore local settings and agent worktrees
+.claude/settings.local.json
+.claude/worktrees/
