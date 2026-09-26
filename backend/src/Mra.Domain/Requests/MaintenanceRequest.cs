@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Mra.Domain.Requests;
 
 // Aggregate root for the workflow (architecture §4.1). Status changes only through the methods
@@ -127,6 +129,58 @@ public sealed class MaintenanceRequest
         EnsureCommentLength(comment);
 
         TransitionTo(RequestStatus.Rejected, actorUserId, AuditActions.Rejected, NormaliseComment(comment), now);
+    }
+
+    /// <summary>
+    /// Completes an approved request with its actual cost and flags an overrun (FR-4.4):
+    /// an auto-approved request overruns when <c>ActualCost &gt;= ThresholdAtDecision</c>; a
+    /// manually approved one when <c>ActualCost &gt; EstimatedCost</c>. On an overrun the request
+    /// still completes, <see cref="ExceededThreshold"/> is set and the audit comment records it.
+    /// Who may complete (the raiser or an Approver) is a handler ownership rule, not checked here.
+    /// </summary>
+    /// <remarks>
+    /// Handlers must load <see cref="AuditEntries"/> (for example with
+    /// <c>Include(r =&gt; r.AuditEntries)</c>) before calling this: auto versus manual approval is
+    /// read from the <see cref="RequestStatus.Approved"/> entry, whose actor is null for
+    /// auto-approval. If the entries are not loaded, this throws
+    /// <see cref="InvalidOperationException"/> rather than guessing.
+    /// </remarks>
+    /// <exception cref="InvalidTransitionException">The request is not approved.</exception>
+    public void Complete(Guid actorUserId, decimal actualCost, DateTime now)
+    {
+        EnsureNotEmpty(actorUserId, nameof(actorUserId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(actualCost);
+        RequestTransitions.EnsureAllowed(Status, RequestStatus.Completed);
+
+        var overrunComment = DescribeOverrun(actualCost);
+
+        TransitionTo(RequestStatus.Completed, actorUserId, AuditActions.Completed, overrunComment, now);
+        ActualCost = actualCost;
+        CompletedAt = now;
+        ExceededThreshold = overrunComment is not null;
+    }
+
+    // Returns the audit comment for an overrun, or null when the actual cost is within what was
+    // authorised (FR-4.4).
+    private string? DescribeOverrun(decimal actualCost)
+    {
+        var approval = _auditEntries.LastOrDefault(e => e.ToStatus == RequestStatus.Approved)
+            ?? throw new InvalidOperationException(
+                "The request's audit entries must be loaded before it is completed.");
+
+        if (approval.ActorUserId is null)
+        {
+            var threshold = ThresholdAtDecision
+                ?? throw new InvalidOperationException("An auto-approved request has no threshold snapshot.");
+
+            return actualCost >= threshold
+                ? string.Create(CultureInfo.InvariantCulture, $"Actual cost {actualCost:N2} reached or exceeded the auto-approval threshold {threshold:N2}.")
+                : null;
+        }
+
+        return actualCost > EstimatedCost
+            ? string.Create(CultureInfo.InvariantCulture, $"Actual cost {actualCost:N2} exceeded the approved estimate {EstimatedCost:N2}.")
+            : null;
     }
 
     private void EnsureNotSelfDecision(Guid actorUserId)
