@@ -68,22 +68,22 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
     - one `SaveChanges` per command
   - [X] Add `.claude/settings.json` with the deny rules from Git rules §9.
   - [X] Create `docs/AI-LOG.md` with a working-notes section. Every developer logs their prompts and agent mistakes here as they go.
-- [ ] **T0.3 Backend skeleton** · `chore/{date}/backend-skeleton`
-  - [ ] Create `MaintenanceApprovals.slnx` with `Mra.Domain`, `Mra.Application`, `Mra.Infrastructure`, `Mra.Api`, `Mra.DbMigrator`, `Mra.Domain.Tests` and `Mra.Api.IntegrationTests`.
-  - [ ] Add project references so dependencies only point inward.
-  - [ ] Add `Directory.Build.props`: nullable enabled, warnings as errors, NuGet audit on.
-  - [ ] Add `Directory.Packages.props` with pinned versions: MediatR 12.5.0, FluentValidation, EF Core 10, xUnit, Testcontainers.
-  - [ ] The empty solution builds and the empty test run passes.
+- [X] **T0.3 Backend skeleton** · `chore/{date}/backend-skeleton`
+  - [X] Create `MaintenanceApprovals.slnx` with `Mra.Domain`, `Mra.Application`, `Mra.Infrastructure`, `Mra.Api`, `Mra.DbMigrator`, `Mra.Domain.Tests` and `Mra.Api.IntegrationTests`.
+  - [X] Add project references so dependencies only point inward.
+  - [X] Add `Directory.Build.props`: nullable enabled, warnings as errors, NuGet audit on.
+  - [X] Add `Directory.Packages.props` with pinned versions: MediatR 12.5.0, FluentValidation, EF Core 10, xUnit, Testcontainers.
+  - [X] The empty solution builds and the empty test run passes.
 - [X] **T0.4 Frontend skeleton** · `chore/{date}/frontend-skeleton`
   - [X] Create an Angular 22 app with standalone components and routing, and no UI library.
   - [X] Add `proxy.conf.json` so `/api` goes to the local API when using `ng serve`.
-- [ ] **T0.5 Infrastructure skeleton** · `chore/{date}/infra-skeleton`
-  - [ ] Add `infra/docker-compose.yml` with the `sqlserver` service: pinned image, `sqlcmd` health check, named volume.
-  - [ ] Add `infra/.env.example` with placeholder values only.
-  - [ ] Add `infra/setup.sh` and `infra/setup.ps1`, which generate `.env` with random secrets if it doesn't exist.
-- [ ] **T0.6 API contract** · `docs/{date}/api-contract` (Dev 3, parallel with T0.3–T0.5)
-  - [ ] Write `docs/api-contract.md` covering every route in architecture §5, with its request and response shapes and the ProblemDetails error format.
-  - [ ] Have Lanes A, C and D review and approve it. **After that, changes to the contract need agreement from all lanes.**
+- [X] **T0.5 Infrastructure skeleton** · `chore/{date}/infra-skeleton`
+  - [X] Add `infra/docker-compose.yml` with the `sqlserver` service: pinned image, `sqlcmd` health check, named volume.
+  - [X] Add `infra/.env.example` with placeholder values only.
+  - [X] Add `infra/setup.sh` and `infra/setup.ps1`, which generate `.env` with random secrets if it doesn't exist.
+- [X] **T0.6 API contract** · `docs/{date}/api-contract` (Dev 3, parallel with T0.3–T0.5)
+  - [X] Write `docs/api-contract.md` covering every route in architecture §5, with its request and response shapes and the ProblemDetails error format.
+  - [X] Have Lanes A, C and D review and approve it. **After that, changes to the contract need agreement from all lanes.**
 
 ---
 
