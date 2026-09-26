@@ -108,21 +108,21 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
 
 ### Lane B — Persistence and tenant isolation (Dev 2; starts after T1.1)
 
-- [ ] **T2 Persistence** · `feat/{date}/persistence-tenant-isolation`
-  - [ ] **T2.1** Add `IAppDbContext` in Application and `AppDbContext` in Infrastructure.
-  - [ ] **T2.2** Add entity configurations:
+- [X] **T2 Persistence** · `feat/{date}/persistence-tenant-isolation`
+  - [X] **T2.1** Add `IAppDbContext` in Application and `AppDbContext` in Infrastructure.
+  - [X] **T2.2** Add entity configurations:
     - `decimal(18,2)` for money
     - `tinyint` enums with check constraints
     - `rowversion` on `MaintenanceRequests`
     - a unique index on `Users(Email)`
-  - [ ] **T2.3** Add the alternate key `Sites(Id, OrganisationId)` and the **composite FK** `MaintenanceRequests(SiteId, OrganisationId)` to it. `RaisedByUserId` uses a plain FK (architecture §6).
-  - [ ] **T2.4** Add the indexes listed in architecture §6.
-  - [ ] **T2.5** Add the `ICurrentUser` abstraction and the **global query filters** on all tenant-owned entities.
-  - [ ] **T2.6** Add a `SaveChangesInterceptor` that:
+  - [X] **T2.3** Add the alternate key `Sites(Id, OrganisationId)` and the **composite FK** `MaintenanceRequests(SiteId, OrganisationId)` to it. `RaisedByUserId` uses a plain FK (architecture §6).
+  - [X] **T2.4** Add the indexes listed in architecture §6.
+  - [X] **T2.5** Add the `ICurrentUser` abstraction and the **global query filters** on all tenant-owned entities.
+  - [X] **T2.6** Add a `SaveChangesInterceptor` that:
     - stamps `OrganisationId` on new tenant entities
     - blocks cross-tenant writes
     - blocks modifying or deleting any `AuditEntry`
-  - [ ] **T2.7** Add the initial migration. **A human reads the generated SQL** before the PR is raised.
+  - [X] **T2.7** Add the initial migration. **A human reads the generated SQL** before the PR is raised.
 - [ ] **T2.8 DbMigrator** · `feat/{date}/db-migrator`
   - [ ] Apply migrations using the owner login.
   - [ ] Idempotently create the `mra_app` login and user, then add the grants and **`DENY UPDATE, DELETE ON AuditEntries`**.
