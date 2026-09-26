@@ -50,6 +50,8 @@ On first start, services come up in this order: SQL Server → migrator (applies
 | Web UI | http://localhost:8080 |
 | API reference (Scalar) | http://localhost:5080/scalar |
 
+The local stack runs the API in the `Development` environment so that Scalar is available. A production deployment would not enable it.
+
 To stop the stack, run `docker compose down`. To also delete the database, run `docker compose down -v`.
 
 ---

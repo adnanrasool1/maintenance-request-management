@@ -145,7 +145,7 @@ Common/
 | `NotFoundException` (includes other-tenant IDs) | 404 |
 | `InvalidTransitionException`, `DbUpdateConcurrencyException` | 409 |
 
-- The OpenAPI document and Scalar UI are enabled in Development only. They are the way to run the admin actions, since those are API-only.
+- The OpenAPI document and Scalar UI are enabled in Development only. They are the way to run the admin actions, since those are API-only. The local compose stack therefore runs the API with `ASPNETCORE_ENVIRONMENT=Development` (§12); a production deployment would not.
 
 ### 4.5 DbMigrator (`Mra.DbMigrator`)
 
@@ -311,7 +311,7 @@ infra/
 
 1. `sqlserver`: pinned `mssql/server:2022` image. Its health check uses `sqlcmd`, and data is kept in a named volume.
 2. `migrator`: starts once `sqlserver` is healthy (`depends_on: service_healthy`), then exits.
-3. `api`: starts once the migrator has finished successfully (`depends_on: service_completed_successfully`). Exposed on `localhost:5080` so Scalar is reachable.
+3. `api`: starts once the migrator has finished successfully (`depends_on: service_completed_successfully`). Exposed on `localhost:5080` and run with `ASPNETCORE_ENVIRONMENT=Development` so Scalar is reachable. This is for the local stack only.
 4. `web`: nginx, exposed on `localhost:8080`.
 
 **Reviewer flow:**

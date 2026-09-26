@@ -36,6 +36,7 @@ YAGNI never applies to security or correctness. Tenant isolation, server-side au
 | **Another tenant's ID returns 404, not 403** | E | 403 | Clients can't tell "forbidden" from "missing", which is intended. |
 | **Two database logins:** the migrator uses the owner login; the API uses `mra_app` with `DENY UPDATE, DELETE` on the audit table | E | A single `sa` login | More setup, but the audit trail is protected even from bugs in the application. |
 | **JWT in `sessionStorage`**, single origin through nginx, CSP, 60-minute lifetime | E | HttpOnly cookies | Weaker against XSS than cookies. The risk is reduced by the CSP and the short lifetime. |
+| **Local compose runs the API as `Development`** so reviewers can do the admin setup through Scalar | E | A separate "enable API docs" setting; curl examples only | Simple and uses the standard switch, but the local container isn't production-configured. Production never enables Scalar. |
 | **Tests against real SQL Server** (Testcontainers) on the risk areas only | E | EF InMemory; aiming for coverage | Slower tests, but they check exactly what InMemory would ignore: filters, FKs and permissions. |
 
 ## 3. Product decisions
