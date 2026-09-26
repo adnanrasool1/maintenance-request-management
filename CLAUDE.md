@@ -82,7 +82,7 @@ If documents conflict, the PRD wins on behaviour and the architecture document w
 
 ### Security
 
-- **Every endpoint has an explicit authorization policy.** A fallback policy requires authentication. The only anonymous endpoint is login. Never add `AllowAnonymous` anywhere else.
+- **Every endpoint has an explicit authorization policy.** A fallback policy requires authentication. The only anonymous API endpoint is login. The one approved exception is the OpenAPI document and Scalar UI, which are anonymous **and mapped in Development only** (see DECISIONS). Never add `AllowAnonymous` anywhere else.
 - Enforce authorisation on the server with endpoint policies, handler ownership checks and domain invariants. Hiding something in the UI is not authorisation.
 - Validate all input at the API boundary with FluentValidation.
 - Login returns the **same error** whether the email or the password is wrong.
