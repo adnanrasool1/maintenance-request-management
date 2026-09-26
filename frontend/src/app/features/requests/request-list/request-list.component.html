@@ -1,0 +1,52 @@
+<div class="toolbar">
+  <h2>{{ isApprover() ? 'Organisation requests' : 'My requests' }}</h2>
+  @if (isApprover()) {
+    <label>
+      Status
+      <select #filter [value]="status()" (change)="onStatusChange(filter.value)">
+        <option value="">All</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ statusLabel(s) }}</option>
+        }
+      </select>
+    </label>
+  }
+  @if (canCreate()) {
+    <a class="button" routerLink="/requests/new">New request</a>
+  }
+</div>
+
+@if (error()) {
+  <p class="alert" role="alert">{{ error() }}</p>
+} @else if (loading()) {
+  <p class="muted">Loading…</p>
+} @else if (requests().length === 0) {
+  <p class="muted">No requests found.</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Site</th>
+        <th>Description</th>
+        <th class="num">Estimated cost</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of requests(); track r.id) {
+        <tr>
+          <td>{{ r.siteName }}</td>
+          <td>
+            <a [routerLink]="['/requests', r.id]">{{ r.description }}</a>
+          </td>
+          <td class="num">{{ r.estimatedCost | number: '1.2-2' }}</td>
+          <td>
+            <span class="status status-{{ r.status }}">{{ statusLabel(r.status) }}</span>
+          </td>
+          <td>{{ r.createdAt | date: 'medium' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

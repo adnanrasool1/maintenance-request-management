@@ -131,23 +131,23 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
 ### Lane C — Auth and API plumbing (Dev 3)
 
 - [ ] **T3 Platform** · `feat/{date}/auth-api-plumbing`
-  - [ ] **T3.1** Register MediatR 12.5.0 and add a `ValidationBehavior` backed by FluentValidation.
-  - [ ] **T3.2** Add the `IExceptionHandler` that maps exceptions to ProblemDetails (400, 401, 403, 404, 409) as in architecture §4.4.
-  - [ ] **T3.3** Add JWT issuing and validation. The signing key, issuer and audience come from the environment, and startup fails if the key is missing or weak.
-  - [ ] **T3.4** Add a `PasswordHasher<T>` adapter and a `CurrentUser` implementation that reads claims only.
-  - [ ] **T3.5** Add authorization policies (SystemAdmin, TenantAdmin, Requester, Approver, ApproverOrTenantAdmin, OrgMember) and a **fallback policy that requires authentication**.
-  - [ ] **T3.6** Add the OpenAPI document and the Scalar UI, enabled in Development only.
+  - [X] **T3.1** Register MediatR 12.5.0 and add a `ValidationBehavior` backed by FluentValidation.
+  - [X] **T3.2** Add the `IExceptionHandler` that maps exceptions to ProblemDetails (400, 401, 403, 404, 409) as in architecture §4.4.
+  - [X] **T3.3** Add JWT issuing and validation. The signing key, issuer and audience come from the environment, and startup fails if the key is missing or weak.
+  - [X] **T3.4** Add a `PasswordHasher<T>` adapter and a `CurrentUser` implementation that reads claims only.
+  - [X] **T3.5** Add authorization policies (SystemAdmin, TenantAdmin, Requester, Approver, ApproverOrTenantAdmin, OrgMember) and a **fallback policy that requires authentication**.
+  - [X] **T3.6** Add the OpenAPI document and the Scalar UI, enabled in Development only.
   - [ ] **T3.7** Add the login command and endpoint. It returns the same error whether the email or the password is wrong, and it is one of the allowed uses of `IgnoreQueryFilters()`.
 
 ### Lane D — Frontend on mocks (Dev 4)
 
-- [ ] **T4 Angular app** · `feat/{date}/frontend-core`
-  - [ ] **T4.1** Add the models from `docs/api-contract.md` and a mock API service that can be switched on or off.
-  - [ ] **T4.2** Add the core pieces: `AuthService` (token in `sessionStorage`, signals), an auth interceptor, an error interceptor (401 → login), and an auth guard.
-  - [ ] **T4.3** Add the login page.
-  - [ ] **T4.4** Add the request list page, with a status filter for Approvers.
-  - [ ] **T4.5** Add the create request page, with a site dropdown and form validation that mirrors the server rules.
-  - [ ] **T4.6** Add the request detail page. Approve and Reject are shown only to Approvers on pending requests that aren't their own; this is for the user experience only, since the server enforces the rules.
+- [X] **T4 Angular app** · `feat/{date}/frontend-core`
+  - [X] **T4.1** Add the models from `docs/api-contract.md` and a mock API service that can be switched on or off.
+  - [X] **T4.2** Add the core pieces: `AuthService` (token in `sessionStorage`, signals), an auth interceptor, an error interceptor (401 → login), and an auth guard.
+  - [X] **T4.3** Add the login page.
+  - [X] **T4.4** Add the request list page, with a status filter for Approvers.
+  - [X] **T4.5** Add the create request page, with a site dropdown and form validation that mirrors the server rules.
+  - [X] **T4.6** Add the request detail page. Approve and Reject are shown only to Approvers on pending requests that aren't their own; this is for the user experience only, since the server enforces the rules.
 - [ ] **T4.7 Web container** · `chore/{date}/web-container`
   - [ ] Add a multi-stage `frontend/Dockerfile` (Node build, then nginx).
   - [ ] Add `nginx.conf`: SPA fallback, proxy `/api` to `api:8080`, and security headers (CSP, `nosniff`, `Referrer-Policy`).
