@@ -2,6 +2,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Mra.Application.Common.Abstractions;
 using Mra.Domain.Organisations;
+using Mra.Domain.Requests;
 using Mra.Domain.Sites;
 using Mra.Domain.Users;
 using Mra.Infrastructure.Persistence;
@@ -63,31 +64,30 @@ public sealed class SqlServerFixture : IAsyncLifetime
         return new Tenant(organisation.Id, site.Id, user.Id);
     }
 
-    // The domain has no public way to create a request or audit entry yet (lane A, T1.2-T1.6),
-    // so these rows are inserted with parameterised SQL. Replace with MaintenanceRequest.Raise
-    // once it exists.
-    public async Task<Guid> InsertRequestWithAuditAsync(
-        Tenant tenant,
-        DateTime? completedAt = null,
-        Guid? siteId = null)
+    // Raises a request (auto-approved: 100 is below the 500 threshold) as a caller in the tenant,
+    // so it goes through the aggregate, the query filters and the write guard. Raise appends two
+    // audit entries (Raised, AutoApproved). The optional site lets a test point at another tenant's site.
+    public async Task<Guid> RaiseRequestAsync(Tenant tenant, bool complete = false, Guid? siteId = null)
     {
-        var requestId = Guid.NewGuid();
-        var createdAt = new DateTime(2026, 9, 26, 9, 30, 0);
+        var request = MaintenanceRequest.Raise(
+            tenant.OrganisationId,
+            siteId ?? tenant.SiteId,
+            tenant.UserId,
+            "Leaking tap",
+            estimatedCost: 100m,
+            currentThreshold: 500m,
+            now: new DateTime(2026, 9, 26, 9, 30, 0, DateTimeKind.Utc));
 
-        await using var db = CreateContext(organisationId: null);
-        await db.Database.ExecuteSqlAsync(
-            $"""
-            INSERT INTO MaintenanceRequests
-                (Id, OrganisationId, SiteId, RaisedByUserId, Description, EstimatedCost, Status, ExceededThreshold, CreatedAt, CompletedAt)
-            VALUES
-                ({requestId}, {tenant.OrganisationId}, {siteId ?? tenant.SiteId}, {tenant.UserId}, {"Leaking tap"}, {100m}, {(byte)1}, {false}, {createdAt}, {completedAt});
+        if (complete)
+        {
+            request.Complete(tenant.UserId, 80m, new DateTime(2026, 9, 26, 17, 45, 0, DateTimeKind.Utc));
+        }
 
-            INSERT INTO AuditEntries (OrganisationId, RequestId, ActorUserId, Action, FromStatus, ToStatus, Comment, OccurredAt)
-            VALUES ({tenant.OrganisationId}, {requestId}, {tenant.UserId}, {"Raised"}, {null}, {(byte)1}, {null}, {createdAt});
-            """,
-            TestContext.Current.CancellationToken);
+        await using var db = CreateContext(tenant.OrganisationId);
+        db.MaintenanceRequests.Add(request);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        return requestId;
+        return request.Id;
     }
 
     public static string UniqueEmail() => $"{Guid.NewGuid():N}@test.local";

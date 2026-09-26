@@ -19,18 +19,21 @@ public sealed class SchemaConstraintTests(SqlServerFixture fixture)
         var orgA = await fixture.SeedTenantAsync();
         var orgB = await fixture.SeedTenantAsync();
 
-        var error = await Assert.ThrowsAsync<SqlException>(
-            () => fixture.InsertRequestWithAuditAsync(orgA, siteId: orgB.SiteId));
+        // The request's OrganisationId is the caller's, so the write guard passes; only the
+        // database can see that the site belongs to org B.
+        var error = await Assert.ThrowsAsync<DbUpdateException>(
+            () => fixture.RaiseRequestAsync(orgA, siteId: orgB.SiteId));
 
-        Assert.Equal(ConstraintViolation, error.Number);
-        Assert.Contains("FK_MaintenanceRequests_Sites_SiteId_OrganisationId", error.Message);
+        var sqlError = Assert.IsType<SqlException>(error.InnerException);
+        Assert.Equal(ConstraintViolation, sqlError.Number);
+        Assert.Contains("FK_MaintenanceRequests_Sites_SiteId_OrganisationId", sqlError.Message);
     }
 
     [Fact]
     public async Task Deleting_a_request_does_not_cascade_to_its_audit_entries()
     {
         var tenant = await fixture.SeedTenantAsync();
-        var requestId = await fixture.InsertRequestWithAuditAsync(tenant);
+        var requestId = await fixture.RaiseRequestAsync(tenant);
 
         await using var db = fixture.CreateContext(tenant.OrganisationId);
         var error = await Assert.ThrowsAsync<SqlException>(
@@ -78,16 +81,16 @@ public sealed class SchemaConstraintTests(SqlServerFixture fixture)
     public async Task Timestamps_read_back_as_utc()
     {
         var tenant = await fixture.SeedTenantAsync();
-        var completedAt = new DateTime(2026, 9, 26, 17, 45, 0);
-        var requestId = await fixture.InsertRequestWithAuditAsync(tenant, completedAt);
+        var requestId = await fixture.RaiseRequestAsync(tenant, complete: true);
 
         await using var db = fixture.CreateContext(tenant.OrganisationId);
         var request = await db.MaintenanceRequests.AsNoTracking().SingleAsync(r => r.Id == requestId, Ct);
-        var entry = await db.AuditEntries.AsNoTracking().SingleAsync(a => a.RequestId == requestId, Ct);
+        var entries = await db.AuditEntries.AsNoTracking().Where(a => a.RequestId == requestId).ToListAsync(Ct);
 
         Assert.Equal(DateTimeKind.Utc, request.CreatedAt.Kind);
         Assert.Equal(DateTimeKind.Utc, request.CompletedAt!.Value.Kind);
-        Assert.Equal(completedAt, request.CompletedAt.Value, TimeSpan.Zero);
-        Assert.Equal(DateTimeKind.Utc, entry.OccurredAt.Kind);
+        Assert.Equal(new DateTime(2026, 9, 26, 17, 45, 0, DateTimeKind.Utc), request.CompletedAt.Value);
+        Assert.Equal(3, entries.Count);
+        Assert.All(entries, e => Assert.Equal(DateTimeKind.Utc, e.OccurredAt.Kind));
     }
 }

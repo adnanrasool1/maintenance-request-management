@@ -131,11 +131,11 @@ public sealed class TenantGuardInterceptorTests(SqlServerFixture fixture)
     public async Task Audit_entries_cannot_be_modified_or_deleted_by_any_caller(bool callerIsTenant)
     {
         var tenant = await fixture.SeedTenantAsync();
-        var requestId = await fixture.InsertRequestWithAuditAsync(tenant);
+        var requestId = await fixture.RaiseRequestAsync(tenant);
         Mra.Domain.Requests.AuditEntry entry;
         await using (var read = fixture.CreateContext(tenant.OrganisationId))
         {
-            entry = await read.AuditEntries.AsNoTracking().SingleAsync(a => a.RequestId == requestId, Ct);
+            entry = await read.AuditEntries.AsNoTracking().OrderBy(a => a.Id).FirstAsync(a => a.RequestId == requestId, Ct);
         }
 
         Guid? caller = callerIsTenant ? tenant.OrganisationId : null;
@@ -154,7 +154,7 @@ public sealed class TenantGuardInterceptorTests(SqlServerFixture fixture)
         }
 
         await using var check = fixture.CreateContext(tenant.OrganisationId);
-        var stored = await check.AuditEntries.SingleAsync(a => a.RequestId == requestId, Ct);
+        var stored = await check.AuditEntries.SingleAsync(a => a.Id == entry.Id, Ct);
         Assert.Null(stored.Comment);
     }
 }

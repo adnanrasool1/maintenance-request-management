@@ -28,7 +28,7 @@ public sealed class TenantQueryFilterTests(SqlServerFixture fixture)
     {
         var orgA = await fixture.SeedTenantAsync();
         var orgB = await fixture.SeedTenantAsync();
-        var requestB = await fixture.InsertRequestWithAuditAsync(orgB);
+        var requestB = await fixture.RaiseRequestAsync(orgB);
 
         await using var db = fixture.CreateContext(orgA.OrganisationId);
 
@@ -48,20 +48,20 @@ public sealed class TenantQueryFilterTests(SqlServerFixture fixture)
     {
         var orgA = await fixture.SeedTenantAsync();
         var orgB = await fixture.SeedTenantAsync();
-        var requestA = await fixture.InsertRequestWithAuditAsync(orgA);
-        await fixture.InsertRequestWithAuditAsync(orgB);
+        var requestA = await fixture.RaiseRequestAsync(orgA);
+        await fixture.RaiseRequestAsync(orgB);
 
         await using var db = fixture.CreateContext(orgA.OrganisationId);
 
         Assert.Equal([requestA], await db.MaintenanceRequests.Select(r => r.Id).ToListAsync(Ct));
-        Assert.Equal([requestA], await db.AuditEntries.Select(a => a.RequestId).ToListAsync(Ct));
+        Assert.Equal([requestA], await db.AuditEntries.Select(a => a.RequestId).Distinct().ToListAsync(Ct));
     }
 
     [Fact]
     public async Task System_admin_with_no_organisation_sees_no_tenant_rows()
     {
         var tenant = await fixture.SeedTenantAsync();
-        await fixture.InsertRequestWithAuditAsync(tenant);
+        await fixture.RaiseRequestAsync(tenant);
         var systemAdmin = User.CreateSystemAdmin(SqlServerFixture.UniqueEmail(), "hash");
         await using (var seed = fixture.CreateContext(organisationId: null))
         {
