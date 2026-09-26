@@ -54,13 +54,30 @@ YAGNI never applies to security or correctness. Tenant isolation, server-side au
 | The approval threshold is capped at **1,000,000.00** as well; a higher value would auto-approve every valid request anyway (API contract D-4) | S |
 | Input limits the PRD leaves open: organisation and site names 1–200 characters, approve/reject comments ≤ 2,000, passwords 8–128, emails ≤ 256 (API contract D-5) | S |
 
+## 3a. Implementation decisions made during delivery
+
+| Decision | Why |
+|---|---|
+| Auto vs manual approval (for the overrun rule) is read from the request's own `Approved` audit entry (null actor = system) | No extra column; the audit trail is already the source of truth. `Complete` needs the entries loaded and throws rather than guess. |
+| Login verifies against a dummy PBKDF2 hash when the email is unknown | Response time doesn't reveal which emails exist (architecture §9). |
+| The migrator detects an existing System Admin via the `UX_Users_Email` unique index, not a lookup | `IgnoreQueryFilters()` stays limited to login and System Admin handlers. Changing `SYSTEM_ADMIN_EMAIL` later seeds a second admin. `mra_app` is also denied `__EFMigrationsHistory`. |
+| Email and site-name uniqueness are case-insensitive through SQL Server's default `CI` collation | Enforced by the unique indexes themselves; emails keep their original case. |
+| Report dates bind as strings and are parsed strictly as `yyyy-MM-dd` | A bad date returns the contract's 400 validation body in every environment; `DateOnly` binding gives a bare 400 outside Development and accepts other formats. |
+| Frontend mocks are an HTTP interceptor present only in the development build | The real services and interceptors run during mock development; the production bundle contains no mock code or fake credentials. |
+| nginx resolves `api` per request; CSP allows `'unsafe-inline'` for styles only | The web container starts before the API. Angular injects component styles at runtime; critical-CSS inlining is off, so no inline script is needed. |
+| Tests run through VSTest (`IsTestingPlatformApplication=false`) | xunit.v3 defaults to Microsoft.Testing.Platform, which the .NET 10 SDK's `dotnet test` only runs with a `global.json` opt-in. |
+| Line endings pinned by `.gitattributes` (container scripts LF) | A Windows checkout would otherwise break `setup.sh` and the nginx config inside Linux containers. |
+| Tests stay focused on the brief's risk list: tenant isolation (incl. ID manipulation), illegal transitions, self-approval, threshold boundary, spend totals, role policies, audit `DENY` | "A few tests, not coverage." No HTTP-level `WebApplicationFactory` suite was added (it would need a new package); isolation is proven at handler and database level against real SQL Server. |
+
 ## 4. Process and ways of working
 
 | Decision | Src |
 |---|---|
 | Strict scope: nothing beyond the brief. Anything essential is **asked for, not built**. | S |
 | Branches `master` / `master-alpha` / `master-dev`; work branches **always from `master`**, with `-dev` and `-alpha` copies for each environment | S |
-| **AI agents cannot approve or merge PRs.** Enforced by `CLAUDE.md`, Claude Code deny rules, and branch protection. | S |
+| **AI agents cannot approve or merge PRs** (`CLAUDE.md`, Claude Code deny rules, branch protection). During the evaluation the stakeholder temporarily let the orchestrating agent merge PRs and resolve conflicts, lifting only the `gh pr merge`/`review` deny rules; migration SQL, the API contract and every rule exception were still approved by the human. | S |
+| The alpha stage is skipped for the evaluation: each task goes PR 1 → `master-dev`, then PR 3 → `master` | S |
+| Claude Code deny rules cover both the Bash and PowerShell tools | E |
 | Merge commits only, **no squash**, no force-push. This keeps the history the brief asks to see. | E |
 | The plan has parallel lanes with `[ ]` / `[X]` tracking. Agents tick their own sub-tasks within the PR. | S |
 
@@ -81,8 +98,7 @@ YAGNI never applies to security or correctness. Tenant isolation, server-side au
 | Row-Level Security, audit hash chain | A threat model includes direct database access |
 | CI pipeline, structured logging and tracing | The code is deployed beyond evaluation |
 | Repository layer, separate read store, event sourcing | Aggregates or read load outgrow EF Core with one database |
-
-**Pending:** D-1, a demo-data seed for reviewers, awaits a stakeholder decision ([plan.md](./plan.md#open-decisions)).
+| Demo-data seed for reviewers (plan D-1, **declined** by the stakeholder; the README walks through the admin setup in Scalar) | Reviewers need a pre-populated environment |
 
 ---
 
