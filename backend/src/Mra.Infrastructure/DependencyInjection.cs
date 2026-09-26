@@ -17,6 +17,10 @@ public static class DependencyInjection
         services.AddSingleton(JwtSettings.FromConfiguration(configuration));
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<ITokenService, JwtTokenService>();
+        services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;
     }
