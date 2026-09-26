@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- IHttpContextAccessor for CurrentUser, and PasswordHasher<T> (Microsoft.Extensions.Identity.Core
+         ships in this shared framework, so it needs no package reference). -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Brings Microsoft.IdentityModel.JsonWebTokens, used to issue tokens. -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
   </ItemGroup>
 

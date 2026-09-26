@@ -38,6 +38,7 @@ YAGNI never applies to security or correctness. Tenant isolation, server-side au
 | **Two database logins:** the migrator uses the owner login; the API uses `mra_app` with `DENY UPDATE, DELETE` on the audit table | E | A single `sa` login | More setup, but the audit trail is protected even from bugs in the application. |
 | **JWT in `sessionStorage`**, single origin through nginx, CSP, 60-minute lifetime | E | HttpOnly cookies | Weaker against XSS than cookies. The risk is reduced by the CSP and the short lifetime. |
 | **Local compose runs the API as `Development`** so reviewers can do the admin setup through Scalar | E | A separate "enable API docs" setting; curl examples only | Simple and uses the standard switch, but the local container isn't production-configured. Production never enables Scalar. |
+| **OpenAPI document and Scalar UI are anonymous in Development only** — the one exception to "only login is anonymous" | S | Keeping them behind the fallback policy (they 401 in a browser, so the README admin flow breaks); curl-only admin setup | The API description is readable without a token on a developer machine. Every API call from Scalar still needs a bearer token, and neither endpoint exists outside Development. |
 | **Tests against real SQL Server** (Testcontainers) on the risk areas only | E | EF InMemory; aiming for coverage | Slower tests, but they check exactly what InMemory would ignore: filters, FKs and permissions. |
 
 ## 3. Product decisions
