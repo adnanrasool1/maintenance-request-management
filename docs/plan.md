@@ -201,28 +201,28 @@ Every feature below consists of a command or query, a validator, a manual mapper
   - [X] Switch off the mocks and run against the real API through the nginx proxy.
   - [ ] Smoke-test the full flow: log in, create a request, approve it, reject one, and view the list as each role.
 - [ ] **T11 Security and setup verification** (PM with Dev 2)
-  - [ ] Search the code for `IgnoreQueryFilters`; it should appear only in the allowed places.
-  - [ ] Scan the git history for secrets, and confirm `.env` is not tracked.
-  - [ ] Confirm `dotnet list package --vulnerable` and `npm audit` are clean, or record any accepted issue.
+  - [X] Search the code for `IgnoreQueryFilters`; it should appear only in the allowed places.
+  - [X] Scan the git history for secrets, and confirm `.env` is not tracked.
+  - [X] Confirm `dotnet list package --vulnerable` and `npm audit` are clean, or record any accepted issue.
   - [ ] **Clean-machine test:** fresh clone, setup script, `docker compose up`, working UI in **under 15 minutes**. Time it, and test on Apple Silicon if one is available.
 
 ---
 
 ## M4 — Deliverables and review preparation (PM with all developers)
 
-- [ ] **T12 Documentation** · `docs/{date}/final-deliverables`
-  - [ ] **T12.1** Complete the `README.md`:
+- [X] **T12 Documentation** · `docs/{date}/final-deliverables`
+  - [X] **T12.1** Complete the `README.md`:
     - prerequisites (Docker only) and the Apple Silicon Rosetta note
     - setup steps and the URLs
     - where the System Admin credentials come from
     - how to do the admin setup through Scalar
     - how to run the tests
-  - [ ] **T12.2** Write `docs/DECISIONS.md` (one page): the key choices, what was rejected, and the assumptions (PRD §11). Include any gold-plating that was stopped.
-  - [ ] **T12.3** Write `docs/AI-LOG.md` (one page) from the working notes. It must include:
+  - [X] **T12.2** Write `docs/DECISIONS.md` (one page): the key choices, what was rejected, and the assumptions (PRD §11). Include any gold-plating that was stopped.
+  - [X] **T12.3** Write `docs/AI-LOG.md` (one page) from the working notes. It must include:
     - what was delegated fully, what was delegated with constraints, and what was done by hand
     - at least one real prompt
     - one plausible-but-wrong agent output, with how it was caught
-  - [ ] **T12.4** Check that the commit history is unsquashed and that PRs follow the Git rules.
+  - [X] **T12.4** Check that the commit history is unsquashed and that PRs follow the Git rules.
 - [ ] **T13 Review preparation**
   - [ ] Record the 2-minute walkthrough video.
   - [ ] Rehearse the likely deep-dive questions: where tenant isolation is enforced and why at that layer, audit integrity, the overrun decision, and what was delegated to the agent.
