@@ -202,7 +202,7 @@ erDiagram
 **Key design points**
 
 - **Money** is stored as `decimal(18,2)`. Timestamps are `datetime2`, always in UTC. Primary keys are GUIDs (`uniqueidentifier`), which can't be enumerated by guessing; the exception is `AuditEntries`, which uses a `bigint` identity so entries are strictly ordered by insertion.
-- **The database prevents cross-tenant references.** `Sites` has an alternate key on `(Id, OrganisationId)`. `MaintenanceRequests` references it with a **composite foreign key** `(SiteId, OrganisationId)`. As a result, SQL Server itself rejects a request whose site belongs to a different organisation, even if the application has a bug. Users are handled the same way through `(RaisedByUserId, OrganisationId)`.
+- **The database prevents cross-tenant references.** `Sites` has an alternate key on `(Id, OrganisationId)`. `MaintenanceRequests` references it with a **composite foreign key** `(SiteId, OrganisationId)`. As a result, SQL Server itself rejects a request whose site belongs to a different organisation, even if the application has a bug. `RaisedByUserId` uses a plain foreign key: the raiser is always the caller (taken from the JWT), so it can't be another tenant's user, and `Users.OrganisationId` is nullable (System Admin), which EF Core doesn't allow in an alternate key.
 - **Concurrency:** `RowVersion` on `MaintenanceRequests` provides optimistic concurrency. If two Approvers act on the same request at once, the second save fails and returns 409.
 - **Enums** are stored as `tinyint`, with check constraints on valid values.
 

@@ -115,7 +115,7 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
     - `tinyint` enums with check constraints
     - `rowversion` on `MaintenanceRequests`
     - a unique index on `Users(Email)`
-  - [ ] **T2.3** Add the alternate keys `Sites(Id, OrganisationId)` and `Users(Id, OrganisationId)`, and the **composite FKs** from `MaintenanceRequests` to them.
+  - [ ] **T2.3** Add the alternate key `Sites(Id, OrganisationId)` and the **composite FK** `MaintenanceRequests(SiteId, OrganisationId)` to it. `RaisedByUserId` uses a plain FK (architecture §6).
   - [ ] **T2.4** Add the indexes listed in architecture §6.
   - [ ] **T2.5** Add the `ICurrentUser` abstraction and the **global query filters** on all tenant-owned entities.
   - [ ] **T2.6** Add a `SaveChangesInterceptor` that:
