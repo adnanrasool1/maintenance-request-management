@@ -136,7 +136,7 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
   - [X] **T3.3** Add JWT issuing and validation. The signing key, issuer and audience come from the environment, and startup fails if the key is missing or weak.
   - [X] **T3.4** Add a `PasswordHasher<T>` adapter and a `CurrentUser` implementation that reads claims only.
   - [X] **T3.5** Add authorization policies (SystemAdmin, TenantAdmin, Requester, Approver, ApproverOrTenantAdmin, OrgMember) and a **fallback policy that requires authentication**.
-  - [ ] **T3.6** Add the OpenAPI document and the Scalar UI, enabled in Development only.
+  - [X] **T3.6** Add the OpenAPI document and the Scalar UI, enabled in Development only.
   - [ ] **T3.7** Add the login command and endpoint. It returns the same error whether the email or the password is wrong, and it is one of the allowed uses of `IgnoreQueryFilters()`.
 
 ### Lane D — Frontend on mocks (Dev 4)
