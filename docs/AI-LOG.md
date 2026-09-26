@@ -27,3 +27,10 @@
 - **Prompt:** same as T0.1.
 - **Agent:** `.claude/settings.json` with the git-rules §9 deny list. **Constraint added:** the same rules are mirrored for the `PowerShell` tool, because this machine's primary shell is PowerShell and Bash-only rules wouldn't cover it. This file was also created.
 - **Corrections:** none. Checked: the JSON parses, and each deny rule matches one in git-rules §9 (19 rules × 2 tools).
+
+### T0.4 Frontend skeleton
+
+- **Prompt:** the T0.4 spec from the orchestrating agent: generate an Angular 22 app in `frontend/` with a pinned CLI (no SSR, no UI library), exact dependency versions with `.npmrc` `save-exact=true`, a `proxy.conf.json` for `/api` → `http://localhost:5080` wired into `ng serve`, a trivial root component, `npm test` single-run and headless, then review, tick the plan and open PR 1.
+- **Agent:** generated the app with `@angular/cli@22.2.0` (standalone, routing, CSS, Vitest + jsdom, so no browser is needed). Pinned every dependency to its installed version, added the dev proxy, set `npm test` to `ng test --watch=false`, and replaced the welcome page with a title plus `<router-outlet />`. No services, interceptors or models were added; those belong to T4.
+- **Review finding (fixed in its own commit):** the CLI's generated `frontend/README.md` described `ng generate` and e2e and didn't mention the proxy or the Docker-first setup. It was replaced with short, accurate local-dev notes.
+- **Corrections:** none to agent-written code. Checked: `package.json` has no `^`/`~`; `npm ci` succeeds against the lock file; `npm test` passes 2/2; `npm run build` produced no warnings; `npm audit` and `npm audit --omit=dev` report 0 vulnerabilities; `ng serve` proxied `/api/health` to port 5080 (502 ECONNREFUSED with no API running, as expected); `src/` contains no hosts, ports or CORS config; the root `.gitignore` keeps `node_modules`, `dist`, `.angular` and `frontend/.vscode` out of the diff.
