@@ -160,12 +160,12 @@ Every feature below consists of a command or query, a validator, a manual mapper
 
 ### Lane C — Administration and report (Dev 3)
 
-- [ ] **T6 Admin features** · `feat/{date}/admin-features`
-  - [ ] **T6.1** `POST /api/admin/organisations`: creates an organisation and its first Tenant Admin in one `SaveChanges`. SystemAdmin only. (FR-2.2)
-  - [ ] **T6.2** `POST /api/org/users`: creates a Requester or Approver in the caller's organisation. Email must be unique. (FR-2.3)
-  - [ ] **T6.3** `POST /api/org/sites`: site names are unique within the organisation. (FR-2.4)
-  - [ ] **T6.4** `PUT /api/org/threshold`: the value must be 0 or more. TenantAdmin only. (FR-2.5)
-  - [ ] **T6.5** `GET /api/sites`: any member of the organisation. (FR-2.6)
+- [X] **T6 Admin features** · `feat/{date}/admin-features`
+  - [X] **T6.1** `POST /api/admin/organisations`: creates an organisation and its first Tenant Admin in one `SaveChanges`. SystemAdmin only. (FR-2.2)
+  - [X] **T6.2** `POST /api/org/users`: creates a Requester or Approver in the caller's organisation. Email must be unique. (FR-2.3)
+  - [X] **T6.3** `POST /api/org/sites`: site names are unique within the organisation. (FR-2.4)
+  - [X] **T6.4** `PUT /api/org/threshold`: the value must be 0 or more. TenantAdmin only. (FR-2.5)
+  - [X] **T6.5** `GET /api/sites`: any member of the organisation. (FR-2.6)
 - [ ] **T8 Spend report** · `feat/{date}/spend-report`
   - [ ] **T8.1** Validate that `from ≤ to`, with both dates inclusive and in UTC. (FR-6.2)
   - [ ] **T8.2** Sum `ActualCost` of `Completed` requests by site, including sites with zero spend. The grouping and summing must run in SQL. (FR-6.2, FR-6.3)
