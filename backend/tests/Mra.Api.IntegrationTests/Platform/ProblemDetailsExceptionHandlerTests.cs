@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Mra.Api.Errors;
 using Mra.Application.Common.Exceptions;
+using Mra.Domain.Requests;
+using Mra.Infrastructure.Persistence;
 using Xunit;
 
 namespace Mra.Api.IntegrationTests.Platform;
@@ -60,6 +62,49 @@ public sealed class ProblemDetailsExceptionHandlerTests
         var (status, _, _) = await HandleAsync(new DbUpdateConcurrencyException("row version mismatch"));
 
         Assert.Equal(409, status);
+    }
+
+    [Fact]
+    public async Task Invalid_transition_returns_409_with_fixed_detail()
+    {
+        var (status, _, body) = await HandleAsync(
+            new InvalidTransitionException(RequestStatus.Completed, RequestStatus.Approved));
+
+        Assert.Equal(409, status);
+        Assert.Equal("The request is not in a state that allows this action.", body.GetProperty("detail").GetString());
+        Assert.Equal("Conflict", body.GetProperty("title").GetString());
+    }
+
+    [Fact]
+    public async Task Self_approval_returns_403_with_contract_detail()
+    {
+        var (status, _, body) = await HandleAsync(new SelfApprovalException());
+
+        Assert.Equal(403, status);
+        Assert.Equal("You cannot approve or reject a request you raised.", body.GetProperty("detail").GetString());
+        Assert.Equal("Forbidden", body.GetProperty("title").GetString());
+    }
+
+    [Fact]
+    public async Task Invalid_credentials_returns_401_with_contract_body()
+    {
+        var (status, contentType, body) = await HandleAsync(new InvalidCredentialsException());
+
+        Assert.Equal(401, status);
+        Assert.StartsWith("application/problem+json", contentType);
+        Assert.Equal("Invalid email or password.", body.GetProperty("detail").GetString());
+        Assert.Equal("Unauthorized", body.GetProperty("title").GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.2", body.GetProperty("type").GetString());
+    }
+
+    [Fact]
+    public async Task Tenant_guard_violation_returns_500_without_detail()
+    {
+        var (status, _, body) = await HandleAsync(new TenantGuardException("Cross-tenant write to Site 123"));
+
+        Assert.Equal(500, status);
+        Assert.False(body.TryGetProperty("detail", out _));
+        Assert.DoesNotContain("123", body.GetRawText());
     }
 
     [Fact]
