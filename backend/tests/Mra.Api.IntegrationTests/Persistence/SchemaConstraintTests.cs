@@ -1,5 +1,6 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Mra.Application.Common.Exceptions;
 using Mra.Domain.Users;
 using Xunit;
 
@@ -56,9 +57,12 @@ public sealed class SchemaConstraintTests(SqlServerFixture fixture)
         await db.SaveChangesAsync(Ct);
         db.Users.Add(User.Create(orgB.OrganisationId, email.ToUpperInvariant(), "hash", Role.Approver));
 
-        var error = await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync(Ct));
+        // AppDbContext translates this index violation into DuplicateEmailException (contract D-2);
+        // the database is still what rejects it.
+        var error = await Assert.ThrowsAsync<DuplicateEmailException>(() => db.SaveChangesAsync(Ct));
 
-        var sqlError = Assert.IsType<SqlException>(error.InnerException);
+        var updateError = Assert.IsType<DbUpdateException>(error.InnerException);
+        var sqlError = Assert.IsType<SqlException>(updateError.InnerException);
         Assert.Equal(UniqueIndexViolation, sqlError.Number);
         Assert.Contains("UX_Users_Email", sqlError.Message);
     }
