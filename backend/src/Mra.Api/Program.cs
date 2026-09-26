@@ -1,6 +1,7 @@
 using Mra.Api.Authentication;
 using Mra.Api.Authorization;
 using Mra.Api.Errors;
+using Mra.Api.OpenApi;
 using Mra.Application;
 using Mra.Infrastructure;
 
@@ -13,6 +14,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddJwtBearerAuthentication();
 builder.Services.AddAuthorizationPolicies();
 
+builder.Services.AddOpenApiDocument();
+
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
 
@@ -22,5 +25,7 @@ app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapOpenApiInDevelopment();
 
 app.Run();
