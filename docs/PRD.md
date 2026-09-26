@@ -101,7 +101,11 @@ States: `Raised`, `PendingApproval`, `Approved`, `Rejected`, `Completed`.
 - FR-4.1 Requests with EstimatedCost below the threshold are approved automatically. Requests at or above it need an Approver.
 - FR-4.2 When a request is approved, automatically or manually, the threshold in force at that moment is stored on the request (`ThresholdAtDecision`).
 - FR-4.3 Changing the threshold does not affect requests that were already approved or rejected. Requests already in `PendingApproval` stay pending.
-- FR-4.4 **Overrun decision:** If ActualCost is greater than `ThresholdAtDecision` at completion, the request still becomes `Completed`, `ExceededThreshold` is set to true, and the audit entry records the overrun. Blocking completion would not undo money that has already been spent, so the goal is to make the overrun visible and traceable. A retrospective approval workflow is listed in Future Scope.
+- FR-4.4 **Overrun decision:** A request overruns when its ActualCost is more than was authorised:
+  - **auto-approved:** ActualCost **≥** `ThresholdAtDecision` (it would have needed an Approver, consistent with A-2);
+  - **manually approved:** ActualCost **>** EstimatedCost (more was spent than the Approver approved).
+
+  On an overrun the request still becomes `Completed`, `ExceededThreshold` is set to true, and the audit entry records the overrun. Blocking completion would not undo money that has already been spent, so the goal is to make the overrun visible and traceable. A retrospective approval workflow is listed in Future Scope.
 
 ### FR-5 Request queries
 

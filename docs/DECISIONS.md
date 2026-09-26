@@ -45,7 +45,7 @@ YAGNI never applies to security or correctness. Tenant isolation, server-side au
 | Roles: seeded **System Admin** → creates organisations and **Tenant Admins** → Tenant Admins create **Requesters, Approvers and sites** | S |
 | **The approval threshold** is stored per organisation in the database, and only the Tenant Admin can change it | S |
 | **Sites** are created by the Tenant Admin and shown to org users (for the site dropdown) | S |
-| **Overrun:** if the actual cost is above the threshold the request was approved under, the request still completes, but it is flagged and audited. Blocking completion can't undo money already spent. | E |
+| **Overrun:** if the actual cost is more than was authorised (auto-approved: at or above the threshold it was approved under; manually approved: above the approved estimate), the request still completes, but it is flagged and audited. Comparing manual approvals to the threshold would flag almost all of them, since their estimate was already at or above it. Blocking completion can't undo money already spent. | E |
 | A cost **equal** to the threshold requires approval | E |
 
 ## 4. Process and ways of working
