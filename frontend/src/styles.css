@@ -1,1 +1,219 @@
-/* You can add global styles to this file, and also import other style files */
+/* Plain global styles shared by every screen. No UI library. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: #1d2733;
+  background: #f4f6f9;
+  line-height: 1.5;
+}
+
+a {
+  color: #1f5fa8;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #d9dee5;
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.narrow {
+  max-width: 26rem;
+  margin: 2rem auto;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  font: inherit;
+  border: 1px solid #b8c0cc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.toolbar select {
+  width: auto;
+  margin-left: 0.5rem;
+}
+
+.toolbar label,
+.toolbar h2 {
+  margin: 0;
+}
+
+textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+  border-color: #b3261e;
+}
+
+button,
+.button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  color: #fff;
+  background: #1f5fa8;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.toolbar .button {
+  margin-top: 0;
+}
+
+.cancel {
+  margin-left: 1rem;
+}
+
+.decision {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e3e7ec;
+}
+
+.decision button + button {
+  margin-left: 0.5rem;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button.danger {
+  background: #b3261e;
+}
+
+button.link {
+  margin: 0;
+  padding: 0;
+  background: none;
+  text-decoration: underline;
+}
+
+.field-error {
+  margin: 0.25rem 0 0;
+  color: #b3261e;
+  font-size: 0.9rem;
+}
+
+.alert {
+  margin: 1rem 0 0;
+  padding: 0.75rem;
+  color: #7a1c16;
+  background: #fdecea;
+  border: 1px solid #f3b8b2;
+  border-radius: 4px;
+}
+
+.muted {
+  color: #5b6675;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th,
+td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e3e7ec;
+  vertical-align: top;
+}
+
+th {
+  background: #eef1f5;
+}
+
+td.num,
+th.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  background: #e3e7ec;
+  white-space: nowrap;
+}
+
+.status-PendingApproval {
+  background: #fff2c6;
+}
+
+.status-Approved {
+  background: #d8f0dc;
+}
+
+.status-Rejected {
+  background: #fbd9d6;
+}
+
+.status-Completed {
+  background: #d9e6f7;
+}
+
+dl.details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.5rem 1.5rem;
+  margin: 0;
+}
+
+dl.details dt {
+  font-weight: 600;
+}
+
+dl.details dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
