@@ -81,9 +81,9 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
   - [X] Add `infra/docker-compose.yml` with the `sqlserver` service: pinned image, `sqlcmd` health check, named volume.
   - [X] Add `infra/.env.example` with placeholder values only.
   - [X] Add `infra/setup.sh` and `infra/setup.ps1`, which generate `.env` with random secrets if it doesn't exist.
-- [ ] **T0.6 API contract** · `docs/{date}/api-contract` (Dev 3, parallel with T0.3–T0.5)
-  - [ ] Write `docs/api-contract.md` covering every route in architecture §5, with its request and response shapes and the ProblemDetails error format.
-  - [ ] Have Lanes A, C and D review and approve it. **After that, changes to the contract need agreement from all lanes.**
+- [X] **T0.6 API contract** · `docs/{date}/api-contract` (Dev 3, parallel with T0.3–T0.5)
+  - [X] Write `docs/api-contract.md` covering every route in architecture §5, with its request and response shapes and the ProblemDetails error format.
+  - [X] Have Lanes A, C and D review and approve it. **After that, changes to the contract need agreement from all lanes.**
 
 ---
 
