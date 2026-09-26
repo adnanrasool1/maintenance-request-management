@@ -37,5 +37,6 @@ app.MapAuthEndpoints();
 app.MapReportsEndpoints();
 app.MapAdminEndpoints();
 app.MapSitesEndpoints();
+app.MapRequestsEndpoints();
 
 app.Run();

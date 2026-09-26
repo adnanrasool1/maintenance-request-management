@@ -173,12 +173,12 @@ Every feature below consists of a command or query, a validator, a manual mapper
 
 ### Lane A — Request workflow (Dev 1)
 
-- [ ] **T7 Request features** · `feat/{date}/request-workflow`
-  - [ ] **T7.1** `POST /api/requests`: the site is looked up through the filtered query, so another organisation's site gives 404. Threshold routing is done in the domain. (FR-3, FR-4.1)
-  - [ ] **T7.2** `GET /api/requests?status=`: Requesters see their own requests; Approvers see all in their organisation. Results are projected straight to DTOs. (FR-5.1, FR-5.2)
-  - [ ] **T7.3** `GET /api/requests/{id}`: returns 404 for requests in other organisations and for other Requesters' requests. (FR-5.3)
-  - [ ] **T7.4** `POST /api/requests/{id}/approve` and `/reject`: a `rowversion` conflict returns 409. (FR-3, FR-3.5)
-  - [ ] **T7.5** `POST /api/requests/{id}/complete`: only the raiser or an Approver; the overrun flag is set by the domain. (FR-3, FR-4.4)
+- [X] **T7 Request features** · `feat/{date}/request-workflow`
+  - [X] **T7.1** `POST /api/requests`: the site is looked up through the filtered query, so another organisation's site gives 404. Threshold routing is done in the domain. (FR-3, FR-4.1)
+  - [X] **T7.2** `GET /api/requests?status=`: Requesters see their own requests; Approvers see all in their organisation. Results are projected straight to DTOs. (FR-5.1, FR-5.2)
+  - [X] **T7.3** `GET /api/requests/{id}`: returns 404 for requests in other organisations and for other Requesters' requests. (FR-5.3)
+  - [X] **T7.4** `POST /api/requests/{id}/approve` and `/reject`: a `rowversion` conflict returns 409. (FR-3, FR-3.5)
+  - [X] **T7.5** `POST /api/requests/{id}/complete`: only the raiser or an Approver; the overrun flag is set by the domain. (FR-3, FR-4.4)
 
 ### Lane B — Containers (Dev 2, parallel with M2)
 
