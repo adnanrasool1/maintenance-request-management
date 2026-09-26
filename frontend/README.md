@@ -13,7 +13,7 @@ App code calls the API through relative `/api` paths only. Dependency versions a
 
 ## Mock API (development build only)
 
-`npm start` uses the development build, where `src/environments/environment.development.ts` sets `useMocks = true`. `/api` calls are then answered in the browser by `src/app/core/mock-api.interceptor.ts` (one organisation, sites "Head Office" and "Warehouse North", threshold 5,000). Mock users, all with the password `password`:
+`npm start` uses the development build. Since T10 it talks to the real API on `http://localhost:5080` through `proxy.conf.json` (start the compose stack first). Setting `useMocks = true` in `src/environments/environment.development.ts` switches back to the in-browser mock, where `/api` calls are answered in the browser by `src/app/core/mock-api.interceptor.ts` (one organisation, sites "Head Office" and "Warehouse North", threshold 5,000). Mock users, all with the password `password`:
 
 | Email | Role |
 |---|---|
@@ -21,4 +21,4 @@ App code calls the API through relative `/api` paths only. Dependency versions a
 | `alice@acme.example` | Approver |
 | `carol@acme.example` | Approver |
 
-Mock data resets when the page reloads. Set `useMocks = false` to send `/api` to the real API on `http://localhost:5080` through `proxy.conf.json`. The production build (`npm run build`, used by the web container) never includes the mock.
+Mock data resets when the page reloads. The production build (`npm run build`, used by the web container) never includes the mock.

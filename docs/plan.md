@@ -182,10 +182,10 @@ Every feature below consists of a command or query, a validator, a manual mapper
 
 ### Lane B — Containers (Dev 2, parallel with M2)
 
-- [ ] **T5 Full compose stack** · `chore/{date}/compose-stack`
-  - [ ] **T5.1** Add a multi-stage `backend/Dockerfile` with `api` and `migrator` targets.
-  - [ ] **T5.2** Update compose so services start in order: `sqlserver` (healthy) → `migrator` (completed successfully) → `api` → `web`.
-  - [ ] **T5.3** Confirm the API connects as `mra_app` and the migrator as the owner login, with credentials only from `.env`.
+- [X] **T5 Full compose stack** · `chore/{date}/compose-stack`
+  - [X] **T5.1** Add a multi-stage `backend/Dockerfile` with `api` and `migrator` targets.
+  - [X] **T5.2** Update compose so services start in order: `sqlserver` (healthy) → `migrator` (completed successfully) → `api` → `web`.
+  - [X] **T5.3** Confirm the API connects as `mra_app` and the migrator as the owner login, with credentials only from `.env`.
 
 ---
 
@@ -198,7 +198,7 @@ Every feature below consists of a command or query, a validator, a manual mapper
   - [ ] **T9.4** **Spend report:** totals match a known dataset, covering both edges of the date range, a site with zero spend, and the other organisation's data being excluded.
   - [ ] **T9.5** **Audit integrity:** `UPDATE` and `DELETE` on `AuditEntries` fail when connected as `mra_app`.
 - [ ] **T10 Frontend integration** · `feat/{date}/frontend-live-api` (Dev 4)
-  - [ ] Switch off the mocks and run against the real API through the nginx proxy.
+  - [X] Switch off the mocks and run against the real API through the nginx proxy.
   - [ ] Smoke-test the full flow: log in, create a request, approve it, reject one, and view the list as each role.
 - [ ] **T11 Security and setup verification** (PM with Dev 2)
   - [ ] Search the code for `IgnoreQueryFilters`; it should appear only in the allowed places.
