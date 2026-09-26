@@ -23,14 +23,14 @@ public static class RequestsEndpoints
     {
         var group = app.MapGroup("/api/requests").WithTags("Requests");
 
-        group.MapPost("/", async (CreateRequestCommand command, ISender sender, CancellationToken ct) =>
+        group.MapPost("", async (CreateRequestCommand command, ISender sender, CancellationToken ct) =>
             {
                 var request = await sender.Send(command, ct);
                 return TypedResults.Created($"/api/requests/{request.Id}", request);
             })
             .RequireAuthorization(Policies.Requester);
 
-        group.MapGet("/", async ([FromQuery] string? status, ISender sender, CancellationToken ct) =>
+        group.MapGet("", async ([FromQuery] string? status, ISender sender, CancellationToken ct) =>
                 TypedResults.Ok(await sender.Send(new GetRequestsQuery(status), ct)))
             .RequireAuthorization(Policies.Requester);
 
