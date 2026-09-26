@@ -57,6 +57,8 @@
 - **Review finding (fixed in its own commit):** the CLI's generated `frontend/README.md` described `ng generate` and e2e and didn't mention the proxy or the Docker-first setup. It was replaced with short, accurate local-dev notes.
 - **Corrections:** none to agent-written code. Checked: `package.json` has no `^`/`~`; `npm ci` succeeds against the lock file; `npm test` passes 2/2; `npm run build` produced no warnings; `npm audit` and `npm audit --omit=dev` report 0 vulnerabilities; `ng serve` proxied `/api/health` to port 5080 (502 ECONNREFUSED with no API running, as expected); `src/` contains no hosts, ports or CORS config; the root `.gitignore` keeps `node_modules`, `dist`, `.angular` and `frontend/.vscode` out of the diff.
 
+
+
 ### T1.1 Domain entities
 
 - **Prompt (to a subagent in its own worktree):** add `Organisation`, `Site`, `User`, `MaintenanceRequest` and `AuditEntry` plus byte-backed `Role` and `RequestStatus` enums to `Mra.Domain`, per PRD §5 and architecture §6. Private setters and a private parameterless constructor everywhere, static factories with guard clauses only for `Organisation`, `Site` and `User` (plus `User.CreateSystemAdmin`), no workflow methods, transition table, audit creation or exceptions (T1.2–T1.7), no EF attributes, unit tests for the guards.
