@@ -1,0 +1,70 @@
+<section class="card">
+  <h2>New maintenance request</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label for="siteId">Site</label>
+    <select id="siteId" formControlName="siteId">
+      <option value="" disabled>Choose a site…</option>
+      @for (site of sites(); track site.id) {
+        <option [value]="site.id">{{ site.name }}</option>
+      }
+    </select>
+    @if (sitesLoaded() && sites().length === 0) {
+      <p class="field-error">Your organisation has no sites yet. Ask your Tenant Admin.</p>
+    }
+    @if (form.controls.siteId.touched && form.controls.siteId.hasError('required')) {
+      <p class="field-error">Site is required.</p>
+    }
+    @for (message of serverErrors().siteId; track $index) {
+      <p class="field-error">{{ message }}</p>
+    }
+
+    <label for="description">Description</label>
+    <textarea id="description" formControlName="description"></textarea>
+    @if (form.controls.description.touched) {
+      @if (
+        form.controls.description.hasError('required') ||
+        form.controls.description.hasError('blank')
+      ) {
+        <p class="field-error">Description is required.</p>
+      }
+      @if (form.controls.description.hasError('maxlength')) {
+        <p class="field-error">Description must be at most {{ maxLength }} characters.</p>
+      }
+    }
+    @for (message of serverErrors().description; track $index) {
+      <p class="field-error">{{ message }}</p>
+    }
+
+    <label for="estimatedCost">Estimated cost</label>
+    <input id="estimatedCost" type="number" step="0.01" formControlName="estimatedCost" />
+    @if (form.controls.estimatedCost.touched) {
+      @if (form.controls.estimatedCost.hasError('required')) {
+        <p class="field-error">Estimated cost is required.</p>
+      }
+      @if (form.controls.estimatedCost.hasError('positive')) {
+        <p class="field-error">Estimated cost must be greater than 0.</p>
+      }
+      @if (form.controls.estimatedCost.hasError('maxCost')) {
+        <p class="field-error">Estimated cost must be at most 1,000,000.00.</p>
+      }
+      @if (form.controls.estimatedCost.hasError('decimals')) {
+        <p class="field-error">Estimated cost can have at most 2 decimal places.</p>
+      }
+      @if (form.controls.estimatedCost.hasError('number')) {
+        <p class="field-error">Estimated cost must be a number.</p>
+      }
+    }
+    @for (message of serverErrors().estimatedCost; track $index) {
+      <p class="field-error">{{ message }}</p>
+    }
+
+    @if (error()) {
+      <p class="alert" role="alert">{{ error() }}</p>
+    }
+
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Submitting…' : 'Submit request' }}
+    </button>
+    <a routerLink="/requests" class="cancel">Cancel</a>
+  </form>
+</section>

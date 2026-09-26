@@ -16,6 +16,15 @@ export const routes: Routes = [
         (m) => m.RequestListComponent,
       ),
   },
+  {
+    path: 'requests/new',
+    title: 'New request',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/requests/request-create/request-create.component').then(
+        (m) => m.RequestCreateComponent,
+      ),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'requests' },
   { path: '**', redirectTo: 'requests' },
 ];
