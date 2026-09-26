@@ -24,6 +24,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ICurren
     // and for callers with no user (the migrator).
     public Guid? CurrentOrganisationId => currentUser.OrganisationId;
 
+    // Registered here rather than by the caller, so every AppDbContext is guarded (architecture §7, §8).
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(TenantGuardInterceptor.Instance);
+    }
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         // Every decimal in the model is money (architecture §6).
