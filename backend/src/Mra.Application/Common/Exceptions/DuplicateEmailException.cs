@@ -7,4 +7,4 @@ namespace Mra.Application.Common.Exceptions;
 /// only login and System Admin handlers may bypass the tenant filter.
 /// </summary>
 public sealed class DuplicateEmailException(Exception innerException)
-    : Exception("The email is already in use.", innerException);
+    : Exception("Email is already in use.", innerException);
