@@ -1,0 +1,70 @@
+<p><a routerLink="/requests">&larr; Back to requests</a></p>
+
+@if (loading()) {
+  <p class="muted">Loading…</p>
+} @else if (loadError()) {
+  <p class="alert" role="alert">{{ loadError() }}</p>
+} @else if (request(); as r) {
+  <section class="card">
+    <h2>Maintenance request</h2>
+    <dl class="details">
+      <dt>Status</dt>
+      <dd>
+        <span class="status status-{{ r.status }}">{{ statusLabel(r.status) }}</span>
+      </dd>
+      <dt>Site</dt>
+      <dd>{{ r.siteName }}</dd>
+      <dt>Raised by</dt>
+      <dd>{{ r.raisedByEmail }}</dd>
+      <dt>Created</dt>
+      <dd>{{ r.createdAt | date: 'medium' }}</dd>
+      <dt>Description</dt>
+      <dd>{{ r.description }}</dd>
+      <dt>Estimated cost</dt>
+      <dd>{{ r.estimatedCost | number: '1.2-2' }}</dd>
+      @if (r.thresholdAtDecision !== null) {
+        <dt>Threshold at decision</dt>
+        <dd>{{ r.thresholdAtDecision | number: '1.2-2' }}</dd>
+      }
+      @if (r.actualCost !== null) {
+        <dt>Actual cost</dt>
+        <dd>
+          {{ r.actualCost | number: '1.2-2' }}
+          @if (r.exceededThreshold) {
+            <strong>(exceeded the threshold)</strong>
+          }
+        </dd>
+      }
+      @if (r.completedAt) {
+        <dt>Completed</dt>
+        <dd>{{ r.completedAt | date: 'medium' }}</dd>
+      }
+    </dl>
+
+    @if (canDecide()) {
+      <div class="decision">
+        <h3>Decision</h3>
+        <label for="comment">Comment (optional)</label>
+        <textarea id="comment" [formControl]="comment"></textarea>
+        @if (comment.hasError('maxlength')) {
+          <p class="field-error">Comment must be at most {{ maxLength }} characters.</p>
+        }
+        <button type="button" (click)="decide('approve')" [disabled]="deciding() !== null">
+          {{ deciding() === 'approve' ? 'Approving…' : 'Approve' }}
+        </button>
+        <button
+          type="button"
+          class="danger"
+          (click)="decide('reject')"
+          [disabled]="deciding() !== null"
+        >
+          {{ deciding() === 'reject' ? 'Rejecting…' : 'Reject' }}
+        </button>
+      </div>
+    }
+
+    @if (actionError()) {
+      <p class="alert" role="alert">{{ actionError() }}</p>
+    }
+  </section>
+}

@@ -25,6 +25,15 @@ export const routes: Routes = [
         (m) => m.RequestCreateComponent,
       ),
   },
+  {
+    path: 'requests/:id',
+    title: 'Request',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/requests/request-detail/request-detail.component').then(
+        (m) => m.RequestDetailComponent,
+      ),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'requests' },
   { path: '**', redirectTo: 'requests' },
 ];
