@@ -57,6 +57,8 @@
 - **Review finding (fixed in its own commit):** the CLI's generated `frontend/README.md` described `ng generate` and e2e and didn't mention the proxy or the Docker-first setup. It was replaced with short, accurate local-dev notes.
 - **Corrections:** none to agent-written code. Checked: `package.json` has no `^`/`~`; `npm ci` succeeds against the lock file; `npm test` passes 2/2; `npm run build` produced no warnings; `npm audit` and `npm audit --omit=dev` report 0 vulnerabilities; `ng serve` proxied `/api/health` to port 5080 (502 ECONNREFUSED with no API running, as expected); `src/` contains no hosts, ports or CORS config; the root `.gitignore` keeps `node_modules`, `dist`, `.angular` and `frontend/.vscode` out of the diff.
 
+
+
 ### T1.1 Domain entities
 
 - **Prompt (to a subagent in its own worktree):** add `Organisation`, `Site`, `User`, `MaintenanceRequest` and `AuditEntry` plus byte-backed `Role` and `RequestStatus` enums to `Mra.Domain`, per PRD §5 and architecture §6. Private setters and a private parameterless constructor everywhere, static factories with guard clauses only for `Organisation`, `Site` and `User` (plus `User.CreateSystemAdmin`), no workflow methods, transition table, audit creation or exceptions (T1.2–T1.7), no EF attributes, unit tests for the guards.
@@ -90,6 +92,8 @@
 - **Agent mistakes, all caught before commit:** (1) The first mock switch was `environment.useMocks ? [mockApiInterceptor] : []` in `app.config.ts`. It looked right, but grepping the production bundle for a mock email showed the mock, with its fake passwords, was still being shipped: the `providedIn: 'root'` class isn't tree-shaken. A primitive-const flag didn't fix it either. The fix was to move the import into the development environment file. (2) A temporary backup made during that experiment used a relative path that resolved outside the worktree (`.claude/worktrees/env.bak`). This came to light when the cleanup `rm` failed, and the file was deleted. (3) Running `prettier --write` on `src/app` reformatted four skeleton files the commit didn't otherwise touch. `git status` showed them, and they were reverted. (4) The cost input had `min="0.01"`, which turns on Angular's `MinValidator` and adds a second `min` error next to the custom `positive` rule. Re-reading the template caught it, and the attribute was removed.
 - **Review finding (own commit):** `frontend/README.md` still said `npm start` proxies `/api` to the API, but the development build now uses the mock. The README now documents the switch and the mock users.
 - **Not verified:** no click-through in a browser, because the Chrome extension wasn't connected. `ng serve` compiled and returned 200 for a deep link, and every screen is rendered in component tests. Nothing was run against the real API, which doesn't exist yet.
+
+
 
 ### T2.1–T2.7 Persistence
 
@@ -147,6 +151,8 @@
 - **Agent mistake (caught in self-review, own commit):** the collection routes were mapped as `MapPost("/")`/`MapGet("/")` on the `/api/requests` group, which gives the pattern `/api/requests/` (trailing slash) in the OpenAPI document. Changed to `""`.
 - **Not verified:** no test was run (`dotnet test` deferred to the end by the human); only `dotnet build` (0 warnings, 0 errors) at every commit. The endpoints were not called over HTTP: `AddPersistence` is not wired into `Program.cs` yet, so `IAppDbContext` can't be resolved in the running API, and `SelfApprovalException`/`InvalidTransitionException` give 500 until lane C's mapping lands.
 - **Process note:** two compound bash commands (heredocs after `cd`) were refused by the worktree guard; the files were written with the file tool instead.
+
+
 
 ### T5.1–T5.3 Full compose stack
 
