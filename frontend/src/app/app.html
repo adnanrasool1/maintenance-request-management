@@ -1,2 +1,13 @@
-<h1>Maintenance Requests</h1>
-<router-outlet />
+<header class="topbar">
+  <h1>Maintenance Requests</h1>
+  @if (auth.currentUser(); as user) {
+    <nav>
+      <a routerLink="/requests">Requests</a>
+      <span class="who">{{ user.email }} ({{ user.role }})</span>
+      <button type="button" class="link" (click)="logout()">Sign out</button>
+    </nav>
+  }
+</header>
+<main>
+  <router-outlet />
+</main>
