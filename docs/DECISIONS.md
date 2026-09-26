@@ -33,6 +33,7 @@ YAGNI never applies to security or correctness. Tenant isolation, server-side au
 | **One `SaveChanges` per command**, with no transaction pipeline behaviour | E | `TransactionBehavior` | Commands must be designed to finish with a single save. |
 | **Tenant isolation in the data-access layer:** org ID from the JWT, global query filters, a write interceptor, and composite FKs | E | Per-endpoint checks; SQL Server Row-Level Security; database or schema per tenant | Less protection than RLS if an attacker got direct database access. RLS is listed as future hardening. |
 | **Composite FK for request → site only**; plain FK for the raiser | E | Composite FK to `Users(Id, OrganisationId)` as well | The raiser always comes from the JWT, and the System Admin's null `OrganisationId` can't be part of an EF Core alternate key. |
+| **System-wide email uniqueness is enforced by the unique index**; Infrastructure turns the violation into a 400 validation error (API contract D-2) | S | Allowing `IgnoreQueryFilters()` in the Tenant Admin create-user handler; emails unique per organisation | The 400 reveals that an email exists in some organisation, which system-wide uniqueness makes unavoidable. The `IgnoreQueryFilters()` allow-list stays at login and System Admin. |
 | **Another tenant's ID returns 404, not 403** | E | 403 | Clients can't tell "forbidden" from "missing", which is intended. |
 | **Two database logins:** the migrator uses the owner login; the API uses `mra_app` with `DENY UPDATE, DELETE` on the audit table | E | A single `sa` login | More setup, but the audit trail is protected even from bugs in the application. |
 | **JWT in `sessionStorage`**, single origin through nginx, CSP, 60-minute lifetime | E | HttpOnly cookies | Weaker against XSS than cookies. The risk is reduced by the CSP and the short lifetime. |
@@ -49,6 +50,8 @@ YAGNI never applies to security or correctness. Tenant isolation, server-side au
 | **Overrun:** if the actual cost is more than was authorised (auto-approved: at or above the threshold it was approved under; manually approved: above the approved estimate), the request still completes, but it is flagged and audited. Comparing manual approvals to the threshold would flag almost all of them, since their estimate was already at or above it. Blocking completion can't undo money already spent. | E |
 | A cost **equal** to the threshold requires approval | E |
 | Costs are capped at **1,000,000.00**: generous for maintenance work, and it catches typos and absurd values | E |
+| The approval threshold is capped at **1,000,000.00** as well; a higher value would auto-approve every valid request anyway (API contract D-4) | S |
+| Input limits the PRD leaves open: organisation and site names 1–200 characters, approve/reject comments ≤ 2,000, passwords 8–128, emails ≤ 256 (API contract D-5) | S |
 
 ## 4. Process and ways of working
 
