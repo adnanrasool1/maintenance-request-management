@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Mra.Api/Mra.Api.csproj" />
+    <Project Path="src/Mra.Application/Mra.Application.csproj" />
+    <Project Path="src/Mra.DbMigrator/Mra.DbMigrator.csproj" />
+    <Project Path="src/Mra.Domain/Mra.Domain.csproj" />
+    <Project Path="src/Mra.Infrastructure/Mra.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Mra.Api.IntegrationTests/Mra.Api.IntegrationTests.csproj" />
+    <Project Path="tests/Mra.Domain.Tests/Mra.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
