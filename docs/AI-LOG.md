@@ -232,3 +232,14 @@ Other real catches, all in the notes below:
 - **Agent mistakes during T12:**
   - The first DECISIONS edit put the D-1 row after a blank line, outside its table. Caught by re-reading the diff.
   - An inline `node -e` edit broke on an apostrophe in the shell quoting, and the resolver script was rewritten via a file. Both were caught before commit.
+
+### T9 Final test run (orchestrator)
+
+- **Prompt:** the human deferred all test runs to the end: "no need of running test: complete the task then we will run test at the end".
+- **Result on `master`:**
+  - Domain: 53/53.
+  - Frontend: 48/48.
+  - Integration, against Testcontainers SQL Server: 183/184 before the fix, 184/184 after.
+- **The one failure (plausible but wrong, found only because the tests finally ran):** T2's `Duplicate_email_violates_UX_Users_Email_across_organisations` expected a raw `DbUpdateException`. T6 later made `AppDbContext` translate that violation into `DuplicateEmailException`, as contract D-2 requires. Each lane built with 0 warnings, and each lane's tests were correct against the code on its own branch; the break only appeared after both merged. This is the same kind of cross-lane drift that T5 found in the migrator at runtime. Fixed by asserting the translated exception while still checking the inner `SqlException` 2601 names `UX_Users_Email`.
+- **Lesson:** deferring tests saved time, but let two cross-lane regressions reach `master` (the migrator at runtime, and this test). Both were caught before the review.
+- **Plan:** T9.2–T9.5 ticked. They are covered at handler and database level, plus the HTTP smoke test through nginx (T10). T9.1 stays unticked: its harness spec includes `WebApplicationFactory`, which wasn't added because the human chose to keep tests minimal and add no new package.

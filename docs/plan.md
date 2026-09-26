@@ -193,10 +193,10 @@ Every feature below consists of a command or query, a validator, a manual mapper
 
 - [ ] **T9 Integration tests** · `test/{date}/integration-suite` (Dev 2 builds the test harness; Devs 1 and 3 write tests for their own features)
   - [ ] **T9.1** Build the test harness: Testcontainers SQL Server, `WebApplicationFactory`, the DbMigrator logic (including `mra_app`), and a test data builder for two organisations.
-  - [ ] **T9.2** **Tenant isolation:** an Org A user calls every `{id}` endpoint with Org B IDs. Every call returns 404, and the Org B data is unchanged afterwards.
-  - [ ] **T9.3** **Authorisation:** each policy returns 403 for the wrong role, and self-approval returns 403.
-  - [ ] **T9.4** **Spend report:** totals match a known dataset, covering both edges of the date range, a site with zero spend, and the other organisation's data being excluded.
-  - [ ] **T9.5** **Audit integrity:** `UPDATE` and `DELETE` on `AuditEntries` fail when connected as `mra_app`.
+  - [X] **T9.2** **Tenant isolation:** an Org A user calls every `{id}` endpoint with Org B IDs. Every call returns 404, and the Org B data is unchanged afterwards.
+  - [X] **T9.3** **Authorisation:** each policy returns 403 for the wrong role, and self-approval returns 403.
+  - [X] **T9.4** **Spend report:** totals match a known dataset, covering both edges of the date range, a site with zero spend, and the other organisation's data being excluded.
+  - [X] **T9.5** **Audit integrity:** `UPDATE` and `DELETE` on `AuditEntries` fail when connected as `mra_app`.
 - [ ] **T10 Frontend integration** · `feat/{date}/frontend-live-api` (Dev 4)
   - [X] Switch off the mocks and run against the real API through the nginx proxy.
   - [ ] Smoke-test the full flow: log in, create a request, approve it, reject one, and view the list as each role.
