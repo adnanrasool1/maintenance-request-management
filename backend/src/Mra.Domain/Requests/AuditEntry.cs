@@ -1,7 +1,7 @@
 namespace Mra.Domain.Requests;
 
 // Append-only record of one transition (architecture §8): no public setters, no mutating methods.
-// Created only by MaintenanceRequest; the creation path is added in T1.6.
+// Created only by MaintenanceRequest, through the internal Record factory.
 public sealed class AuditEntry
 {
     private AuditEntry()
@@ -27,4 +27,25 @@ public sealed class AuditEntry
     public string? Comment { get; private set; }
 
     public DateTime OccurredAt { get; private set; }
+
+    internal static AuditEntry Record(
+        Guid organisationId,
+        Guid requestId,
+        Guid? actorUserId,
+        string action,
+        RequestStatus? fromStatus,
+        RequestStatus toStatus,
+        string? comment,
+        DateTime occurredAt) =>
+        new()
+        {
+            OrganisationId = organisationId,
+            RequestId = requestId,
+            ActorUserId = actorUserId,
+            Action = action,
+            FromStatus = fromStatus,
+            ToStatus = toStatus,
+            Comment = comment,
+            OccurredAt = occurredAt,
+        };
 }
