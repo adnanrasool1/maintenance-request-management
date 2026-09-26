@@ -1,5 +1,6 @@
 using Mra.Api.Authentication;
 using Mra.Api.Authorization;
+using Mra.Api.Endpoints;
 using Mra.Api.Errors;
 using Mra.Api.OpenApi;
 using Mra.Application;
@@ -27,5 +28,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapOpenApiInDevelopment();
+app.MapRequestsEndpoints();
 
 app.Run();
