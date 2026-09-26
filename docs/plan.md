@@ -148,9 +148,9 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
   - [X] **T4.4** Add the request list page, with a status filter for Approvers.
   - [X] **T4.5** Add the create request page, with a site dropdown and form validation that mirrors the server rules.
   - [X] **T4.6** Add the request detail page. Approve and Reject are shown only to Approvers on pending requests that aren't their own; this is for the user experience only, since the server enforces the rules.
-- [ ] **T4.7 Web container** · `chore/{date}/web-container`
-  - [ ] Add a multi-stage `frontend/Dockerfile` (Node build, then nginx).
-  - [ ] Add `nginx.conf`: SPA fallback, proxy `/api` to `api:8080`, and security headers (CSP, `nosniff`, `Referrer-Policy`).
+- [X] **T4.7 Web container** · `chore/{date}/web-container`
+  - [X] Add a multi-stage `frontend/Dockerfile` (Node build, then nginx).
+  - [X] Add `nginx.conf`: SPA fallback, proxy `/api` to `api:8080`, and security headers (CSP, `nosniff`, `Referrer-Policy`).
 
 ---
 
