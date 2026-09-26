@@ -94,8 +94,8 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
 - [ ] **T1 Domain model** · `feat/{date}/domain-model`
   - [ ] **T1.1** Add the entities `Organisation`, `Site`, `User`, `MaintenanceRequest` and `AuditEntry`, and the enums `Role` and `RequestStatus`. **Merge this first, because Lane B is waiting on it.**
   - [ ] **T1.2** Add the transition table: one static map of allowed `from → to` transitions.
-  - [ ] **T1.3** Add `Raise()` with threshold routing (below the threshold → `Approved`; at or above → `PendingApproval`) and store `ThresholdAtDecision`.
-  - [ ] **T1.4** Add `Approve()` and `Reject()`, including the self-approval check and an optional comment.
+  - [ ] **T1.3** Add `Raise()` with threshold routing (below the threshold → `Approved`; at or above → `PendingApproval`). On automatic approval, store `ThresholdAtDecision` (FR-4.2).
+  - [ ] **T1.4** Add `Approve()` and `Reject()`, including the self-approval check and an optional comment on both (FR-3.4). `Approve()` stores the threshold in force at that moment as `ThresholdAtDecision` (FR-4.2).
   - [ ] **T1.5** Add `Complete()`, which takes the actual cost, sets `CompletedAt`, and sets `ExceededThreshold` when there is an overrun.
   - [ ] **T1.6** Make every transition method append an `AuditEntry`. `AuditEntry` has no public setters.
   - [ ] **T1.7** Add the domain exceptions: `InvalidTransitionException` and the self-approval exception.
