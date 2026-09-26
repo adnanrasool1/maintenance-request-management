@@ -186,6 +186,17 @@ Other real catches, all in the notes below:
 - **Bug found in merged code and fixed (own `fix(db)` commit, flagged in the PR):** the second `docker compose up` failed: the migrator exited 1 with `DuplicateEmailException`. T6.1 made `AppDbContext.SaveChangesAsync` translate the `UX_Users_Email` violation, so the migrator's `catch (DbUpdateException) when (IsDuplicateEmail…)` no longer matched, and after a `down` the API would never start again. The migrator now catches `DuplicateEmailException`. The existing `DatabaseInitializerTests` covers this but had not been run.
 - **Checked (running stack, project `mra-t5`, ports 14331/15080/18080):** migrator `Exited (0)` (migrations applied, `mra_app` created, System Admin seeded); api and web up; `POST /api/auth/login` through nginx → 200 with a token (wrong password → 401); `/scalar` → 302 to `/scalar/` → 200; `GET /` on web → 200. After the fix, two further `up` runs: migrator exit 0 ("database is up to date", "already exists; nothing seeded"), login still 200. T5.3: the api container's environment has only `ConnectionStrings__App` with `User Id=mra_app` and no `sa` or `MSSQL_SA_PASSWORD`; the migrator's has `ConnectionStrings__Owner` with `User Id=sa`; the API's database-backed login succeeded, which it can only do as `mra_app`. `dotnet build` 0 warnings / 0 errors. Stack removed with `down -v` and the local `infra/.env` deleted.
 - **Not verified:** a server-side `SELECT SUSER_NAME()`/`sys.dm_exec_sessions` check (the worktree guard refused the `sqlcmd` call inside the container, so it wasn't retried); a truly cold timing (the SQL Server image and the web build layers were already cached, so the measured 92 s `up --build` mostly reflects the backend image build and SDK/aspnet pulls); `dotnet test` (deferred by the human).
+- **Human manual check on the running stack (SSMS, Scalar and the web UI; done by hand, results as reported by the human):**
+  - Created two organisations as the System Admin.
+  - The System Admin trying to create a user inside an organisation was blocked (correct).
+  - A Tenant Admin of one organisation trying to create a user for the other organisation was blocked (correct).
+  - Reading another organisation's lists was blocked (correct).
+  - The happy path (raise, approve, reject, complete) worked.
+  - An Approver approving their own request was blocked (correct).
+  - A Requester calling approve through the API was blocked (correct).
+  - A request with invalid values was rejected (correct).
+  - A valid request at or above the threshold went to Pending Approval, and one below the threshold was approved automatically (correct).
+  - Reported by the human as problems, still to be decided (neither is a defect against the current PRD): (1) every Approver sees all Requesters' requests in their organisation, which is what PRD FR-5.2 specifies; (2) one Requester can raise several requests for the same site, which the PRD doesn't restrict. Changing either would be a new requirement (a Future Scope proposal in a PR description), not a bug fix.
 
 ### T10 Frontend integration (orchestrator)
 
