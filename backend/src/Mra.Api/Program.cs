@@ -1,4 +1,5 @@
 using Mra.Api.Authentication;
+using Mra.Api.Authorization;
 using Mra.Api.Errors;
 using Mra.Application;
 using Mra.Infrastructure;
@@ -10,6 +11,7 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddJwtBearerAuthentication();
+builder.Services.AddAuthorizationPolicies();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
@@ -19,5 +21,6 @@ var app = builder.Build();
 app.UseExceptionHandler();
 
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
