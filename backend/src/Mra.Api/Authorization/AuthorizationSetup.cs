@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
+using Mra.Domain.Users;
 
 namespace Mra.Api.Authorization;
 
 public static class AuthorizationSetup
 {
-    // Values of the "role" claim (contract §1). TODO(T1.1): use nameof(Role.X) once the Domain enum lands.
-    private const string SystemAdmin = "SystemAdmin";
-    private const string TenantAdmin = "TenantAdmin";
-    private const string Requester = "Requester";
-    private const string Approver = "Approver";
+    // Values of the "role" claim (contract §1), taken from the Domain enum so they can't drift.
+    private const string SystemAdmin = nameof(Role.SystemAdmin);
+    private const string TenantAdmin = nameof(Role.TenantAdmin);
+    private const string Requester = nameof(Role.Requester);
+    private const string Approver = nameof(Role.Approver);
 
     /// <summary>
     /// Role policies from contract §1.1, plus a fallback policy that requires an authenticated
