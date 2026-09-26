@@ -198,7 +198,7 @@ Every feature below consists of a command or query, a validator, a manual mapper
   - [ ] **T9.4** **Spend report:** totals match a known dataset, covering both edges of the date range, a site with zero spend, and the other organisation's data being excluded.
   - [ ] **T9.5** **Audit integrity:** `UPDATE` and `DELETE` on `AuditEntries` fail when connected as `mra_app`.
 - [ ] **T10 Frontend integration** · `feat/{date}/frontend-live-api` (Dev 4)
-  - [ ] Switch off the mocks and run against the real API through the nginx proxy.
+  - [X] Switch off the mocks and run against the real API through the nginx proxy.
   - [ ] Smoke-test the full flow: log in, create a request, approve it, reject one, and view the list as each role.
 - [ ] **T11 Security and setup verification** (PM with Dev 2)
   - [ ] Search the code for `IgnoreQueryFilters`; it should appear only in the allowed places.

@@ -162,3 +162,21 @@
 - **Bug found in merged code and fixed (own `fix(db)` commit, flagged in the PR):** the second `docker compose up` failed: the migrator exited 1 with `DuplicateEmailException`. T6.1 made `AppDbContext.SaveChangesAsync` translate the `UX_Users_Email` violation, so the migrator's `catch (DbUpdateException) when (IsDuplicateEmail…)` no longer matched, and after a `down` the API would never start again. The migrator now catches `DuplicateEmailException`. The existing `DatabaseInitializerTests` covers this but had not been run.
 - **Checked (running stack, project `mra-t5`, ports 14331/15080/18080):** migrator `Exited (0)` (migrations applied, `mra_app` created, System Admin seeded); api and web up; `POST /api/auth/login` through nginx → 200 with a token (wrong password → 401); `/scalar` → 302 to `/scalar/` → 200; `GET /` on web → 200. After the fix, two further `up` runs: migrator exit 0 ("database is up to date", "already exists; nothing seeded"), login still 200. T5.3: the api container's environment has only `ConnectionStrings__App` with `User Id=mra_app` and no `sa` or `MSSQL_SA_PASSWORD`; the migrator's has `ConnectionStrings__Owner` with `User Id=sa`; the API's database-backed login succeeded, which it can only do as `mra_app`. `dotnet build` 0 warnings / 0 errors. Stack removed with `down -v` and the local `infra/.env` deleted.
 - **Not verified:** a server-side `SELECT SUSER_NAME()`/`sys.dm_exec_sessions` check (the worktree guard refused the `sqlcmd` call inside the container, so it wasn't retried); a truly cold timing (the SQL Server image and the web build layers were already cached, so the measured 92 s `up --build` mostly reflects the backend image build and SDK/aspnet pulls); `dotnet test` (deferred by the human).
+
+### T10 Frontend integration (orchestrator)
+
+- **Spec:** switch off the mocks and smoke-test the full flow against the real API through nginx.
+- **Done:** the development build now uses the real API through `proxy.conf.json`; the production image never had the mock. The whole stack was started from `master` with `docker compose up --build`. A scripted smoke test then called the API **through nginx on :8080**, the browser's exact path, and ran 53 checks:
+  - both tenants' admin setup;
+  - threshold routing at the exact boundary (499.99 is auto-approved, 500 goes to pending);
+  - self-approval → 403, and a Requester approving → 403;
+  - a second decision → 409, and completing a rejected request → 409;
+  - cross-tenant request and site IDs → 404;
+  - a Requester reading another Requester's request → 404;
+  - the overrun flag in both directions (auto-approved vs manual);
+  - the spend report with a zero-spend site and the other tenant excluded;
+  - `from > to` → 400;
+  - a duplicate email in a different case → 400;
+  - the SPA deep link.
+- **Result:** 52 of 53 passed. The one "failure" was the smoke script's own assumption: the two login-failure bodies differ only in the per-request `traceId`. Status, title and detail are identical, so nothing reveals whether the email exists. Contract §4 allows `traceId` on any error, but §4.3 says "byte-for-byte the same", which is slightly too strong.
+- **Not verified:** a click-through in a real browser. The Chrome extension wasn't connected, so the smoke-test sub-item stays unticked. Dedicated UI test users were created for a manual run.
