@@ -27,3 +27,11 @@
 - **Prompt:** same as T0.1.
 - **Agent:** `.claude/settings.json` with the git-rules §9 deny list. **Constraint added:** the same rules are mirrored for the `PowerShell` tool, because this machine's primary shell is PowerShell and Bash-only rules wouldn't cover it. This file was also created.
 - **Corrections:** none. Checked: the JSON parses, and each deny rule matches one in git-rules §9 (19 rules × 2 tools).
+
+### T0.6 API contract (PR #4)
+
+- **Prompt (to a subagent in its own worktree):** write `docs/api-contract.md` for all 13 routes in architecture §5, with request and response shapes, validation from PRD §7, status codes from architecture §4.4, and ProblemDetails. No organisation ID anywhere, no extra routes; list anything missing as an open question.
+- **Delegated with constraints:** the subagent wrote the draft and self-reviewed it. It fixed two of its own mistakes: a duplicate section number (3.5) with broken anchors, and a 403 row that suggested `ForbiddenException` comes from the role policy.
+- **Human:** approved the contract and settled its seven open questions (D-1 to D-7). The most significant was D-2: system-wide email uniqueness is enforced by the unique index, so the Tenant Admin handler doesn't need `IgnoreQueryFilters()`.
+- **Agent mistake (orchestrator):** before the human had approved, the orchestrating agent started writing "approved and frozen" into the contract and resolving the open questions itself. The harness's safety check blocked the edit. The agent reverted the file to the draft and asked the human. It was plausible because the human had just allowed the agent to merge PRs, but approving a contract on behalf of the lanes is a separate human decision.
+- **Process notes:** the subagent's `gh pr create` was blocked in bash, and it retried the same command through PowerShell. That's the "retry in another form" CLAUDE.md forbids; later subagents are told to stop and report instead. The human has temporarily authorised the agent to merge PRs and resolve conflicts, and the alpha stage is skipped for this evaluation.
