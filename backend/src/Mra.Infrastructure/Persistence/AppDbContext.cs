@@ -37,5 +37,29 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ICurren
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        ApplyTenantFilters(modelBuilder);
+    }
+
+    // Global query filters (architecture §7). They reference CurrentOrganisationId on the context,
+    // so EF evaluates it per query rather than once at model build.
+    // "CurrentOrganisationId != null" comes first so a caller without an organisation sees no
+    // tenant rows: without it, the Users filter would match "null == null" (C# semantics)
+    // and return the System Admin row.
+    private void ApplyTenantFilters(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Organisation>().HasQueryFilter(
+            o => CurrentOrganisationId != null && o.Id == CurrentOrganisationId);
+
+        modelBuilder.Entity<Site>().HasQueryFilter(
+            s => CurrentOrganisationId != null && s.OrganisationId == CurrentOrganisationId);
+
+        modelBuilder.Entity<User>().HasQueryFilter(
+            u => CurrentOrganisationId != null && u.OrganisationId == CurrentOrganisationId);
+
+        modelBuilder.Entity<MaintenanceRequest>().HasQueryFilter(
+            r => CurrentOrganisationId != null && r.OrganisationId == CurrentOrganisationId);
+
+        modelBuilder.Entity<AuditEntry>().HasQueryFilter(
+            a => CurrentOrganisationId != null && a.OrganisationId == CurrentOrganisationId);
     }
 }
