@@ -52,22 +52,22 @@ Lane D is off the critical path because it builds against the API contract (T0.6
 Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
 
 - [ ] **T0.1 Repository setup** · `chore/{date}/repo-setup`
-  - [ ] Create the folders `backend/`, `frontend/`, `infra/`, `docs/`.
-  - [ ] Add `docs/task-brief.md`, `docs/PRD.md`, `docs/architecture.md`, `docs/git-rules.md`, `docs/plan.md`.
-  - [ ] Add a root `.gitignore` (.NET, Node, `.env`, IDE folders) and `.editorconfig`.
-  - [ ] Add a root `README.md` stub.
-  - [ ] Create the `master`, `master-dev` and `master-alpha` branches.
+  - [X] Create the folders `backend/`, `frontend/`, `infra/`, `docs/`.
+  - [X] Add `docs/task-brief.md`, `docs/PRD.md`, `docs/architecture.md`, `docs/git-rules.md`, `docs/plan.md`.
+  - [X] Add a root `.gitignore` (.NET, Node, `.env`, IDE folders) and `.editorconfig`.
+  - [X] Add a root `README.md` stub.
+  - [X] Create the `master`, `master-dev` and `master-alpha` branches.
   - [ ] Configure branch protection as described in Git rules §8.
-  - [ ] Add `.github/pull_request_template.md`.
-- [ ] **T0.2 Agent configuration** · `chore/{date}/agent-config`
-  - [ ] Write `CLAUDE.md`. It should link the architecture and Git rules documents and state the non-negotiable rules:
+  - [X] Add `.github/pull_request_template.md`.
+- [X] **T0.2 Agent configuration** · `chore/{date}/agent-config`
+  - [X] Write `CLAUDE.md`. It should link the architecture and Git rules documents and state the non-negotiable rules:
     - `IgnoreQueryFilters()` only in login and System Admin handlers
     - MediatR pinned at 12.5.0
     - manual mapping only
     - no new packages without approval
     - one `SaveChanges` per command
-  - [ ] Add `.claude/settings.json` with the deny rules from Git rules §9.
-  - [ ] Create `docs/AI-LOG.md` with a working-notes section. Every developer logs their prompts and agent mistakes here as they go.
+  - [X] Add `.claude/settings.json` with the deny rules from Git rules §9.
+  - [X] Create `docs/AI-LOG.md` with a working-notes section. Every developer logs their prompts and agent mistakes here as they go.
 - [ ] **T0.3 Backend skeleton** · `chore/{date}/backend-skeleton`
   - [ ] Create `MaintenanceApprovals.slnx` with `Mra.Domain`, `Mra.Application`, `Mra.Infrastructure`, `Mra.Api`, `Mra.DbMigrator`, `Mra.Domain.Tests` and `Mra.Api.IntegrationTests`.
   - [ ] Add project references so dependencies only point inward.
