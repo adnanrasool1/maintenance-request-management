@@ -91,7 +91,8 @@ Dependencies point inward only. Domain references nothing; Application reference
 - **Entities:** `Organisation`, `Site`, `User`, `MaintenanceRequest`, `AuditEntry`. Enums: `Role`, `RequestStatus`.
 - **`MaintenanceRequest` is the aggregate root for the workflow.** State only changes through its methods: `Raise(...)`, `Approve(actor, comment, now)`, `Reject(actor, comment, now)`, `Complete(actor, actualCost, now)`. There are no public setters for `Status`.
 - **Transition table:** a single static map of allowed `from → to` transitions. Every method checks it and throws `InvalidTransitionException` for anything else. No state-machine library is used; five states don't need one.
-- **Rules that belong to the domain:** the self-approval check (`actor.Id == RaisedByUserId` is rejected), the threshold routing (below the threshold is auto-approved, at or above goes to pending), the `ThresholdAtDecision` snapshot (taken when the request is approved, automatically or manually; FR-4.2), and the overrun flag.
+- **Domain exceptions** live in `Mra.Domain` (it can't reference Application): `InvalidTransitionException` (→ 409) and `SelfApprovalException` (→ 403).
+- **Rules that belong to the domain:** the self-approval check (`actor.Id == RaisedByUserId` throws `SelfApprovalException`), the threshold routing (below the threshold is auto-approved, at or above goes to pending), the `ThresholdAtDecision` snapshot (taken when the request is approved, automatically or manually; FR-4.2), and the overrun flag.
 - **Audit entries are created by the aggregate.** Each transition method appends an `AuditEntry` to the request's `AuditEntries` collection. Because of this, a state change without an audit record isn't possible, and both are saved in the same `SaveChanges` call.
 
 ### 4.2 Application (`Mra.Application`)
@@ -140,7 +141,7 @@ Common/
 |---|---|
 | `ValidationException` | 400 |
 | Authentication failure | 401 |
-| `ForbiddenException` (for example, self-approval) | 403 |
+| `ForbiddenException` (application ownership rules), `SelfApprovalException` (domain) | 403 |
 | `NotFoundException` (includes other-tenant IDs) | 404 |
 | `InvalidTransitionException`, `DbUpdateConcurrencyException` | 409 |
 

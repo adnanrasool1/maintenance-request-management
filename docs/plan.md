@@ -98,7 +98,7 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
   - [ ] **T1.4** Add `Approve()` and `Reject()`, including the self-approval check and an optional comment on both (FR-3.4). `Approve()` stores the threshold in force at that moment as `ThresholdAtDecision` (FR-4.2).
   - [ ] **T1.5** Add `Complete()`, which takes the actual cost, sets `CompletedAt`, and sets `ExceededThreshold` when there is an overrun.
   - [ ] **T1.6** Make every transition method append an `AuditEntry`. `AuditEntry` has no public setters.
-  - [ ] **T1.7** Add the domain exceptions: `InvalidTransitionException` and the self-approval exception.
+  - [ ] **T1.7** Add the domain exceptions: `InvalidTransitionException` (→ 409) and `SelfApprovalException` (→ 403).
   - [ ] **T1.8** Write unit tests:
     - every illegal transition is rejected
     - a cost exactly equal to the threshold requires approval

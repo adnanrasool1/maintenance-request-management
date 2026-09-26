@@ -57,7 +57,7 @@ If documents conflict, the PRD wins on behaviour and the architecture document w
 
 - Organise code **by feature, one folder per use case**: command or query, handler, validator.
 - Endpoints stay thin: they send a MediatR request and return the result. **No business logic or database access in endpoints.**
-- Handlers signal errors by **throwing the defined exceptions** (`NotFoundException`, `ForbiddenException`, `InvalidTransitionException`, `ValidationException`). The central exception handler turns them into ProblemDetails, so don't build error responses in handlers or endpoints.
+- Handlers signal errors by **throwing the defined exceptions** (`NotFoundException`, `ForbiddenException`, `ValidationException` from Application; `InvalidTransitionException`, `SelfApprovalException` from Domain). The central exception handler turns them into ProblemDetails, so don't build error responses in handlers or endpoints.
 - Don't catch a `DbUpdateConcurrencyException` in order to retry. Let it reach the handler, which returns **409**.
 
 ### Domain and workflow (architecture §4.1)
