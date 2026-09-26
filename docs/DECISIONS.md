@@ -48,6 +48,7 @@ YAGNI never applies to security or correctness. Tenant isolation, server-side au
 | **Sites** are created by the Tenant Admin and shown to org users (for the site dropdown) | S |
 | **Overrun:** if the actual cost is more than was authorised (auto-approved: at or above the threshold it was approved under; manually approved: above the approved estimate), the request still completes, but it is flagged and audited. Comparing manual approvals to the threshold would flag almost all of them, since their estimate was already at or above it. Blocking completion can't undo money already spent. | E |
 | A cost **equal** to the threshold requires approval | E |
+| Costs are capped at **1,000,000.00**: generous for maintenance work, and it catches typos and absurd values | E |
 
 ## 4. Process and ways of working
 

@@ -134,7 +134,7 @@ States: `Raised`, `PendingApproval`, `Approved`, `Rejected`, `Completed`.
 |---|---|
 | **Tenant isolation** | Enforced centrally in the data-access layer, not repeated by hand in each endpoint, and backed by explicit checks on writes. Every tenant-owned table has an `OrganisationId`. |
 | **Authorisation** | All role and ownership checks run on the server. Hiding UI elements is only for convenience. |
-| **Input validation** | Checked at the API boundary. Description: required, max 2,000 characters. Costs: > 0, at most 2 decimal places, sensible upper bound. Report: `from ≤ to`. Emails must be valid and unique. |
+| **Input validation** | Checked at the API boundary. Description: required, max 2,000 characters. Costs (estimated and actual): > 0, at most 2 decimal places, at most 1,000,000.00. Report: `from ≤ to`. Emails must be valid and unique. |
 | **Secrets** | Nothing sensitive in the repository. Locally: user-secrets or `.env` (git-ignored), with a committed `.env.example`. Production: a managed secret store. This is documented, not built. |
 | **Money** | Stored as decimal, never floating point. Single currency. |
 | **Data design** | Schema created through migrations. Indexes support the main queries: requests by org and status, requests by org, site and completion date, and audit entries by request. |
