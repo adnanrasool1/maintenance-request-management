@@ -1,5 +1,6 @@
 # Local stack. Configuration comes from infra/.env (run ./setup.sh or .\setup.ps1 first).
-# T0.5 adds only SQL Server; migrator, api and web are added in T5.
+# Start-up order: sqlserver (healthy) -> migrator (exits 0) -> api -> web (architecture section 12).
+# ${VAR:?...} makes compose stop with a clear message when a required value is missing.
 name: mra
 
 services:
@@ -22,6 +23,53 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    restart: unless-stopped
+
+  # One-shot: applies migrations, creates/updates the mra_app login, seeds the System Admin, exits.
+  # The only service that gets the owner (sa) credentials.
+  migrator:
+    build:
+      context: ../backend
+      target: migrator
+    environment:
+      ConnectionStrings__Owner: "Server=sqlserver,1433;Database=Mra;User Id=sa;Password=${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD must be set in infra/.env};TrustServerCertificate=True;Encrypt=True"
+      MRA_APP_PASSWORD: ${MRA_APP_PASSWORD:?MRA_APP_PASSWORD must be set in infra/.env}
+      SYSTEM_ADMIN_EMAIL: ${SYSTEM_ADMIN_EMAIL:?SYSTEM_ADMIN_EMAIL must be set in infra/.env}
+      SYSTEM_ADMIN_PASSWORD: ${SYSTEM_ADMIN_PASSWORD:?SYSTEM_ADMIN_PASSWORD must be set in infra/.env}
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    restart: "no"
+
+  # Connects as the restricted mra_app login only (architecture section 8); never gets sa credentials.
+  api:
+    build:
+      context: ../backend
+      target: api
+    environment:
+      ConnectionStrings__App: "Server=sqlserver,1433;Database=Mra;User Id=mra_app;Password=${MRA_APP_PASSWORD:?MRA_APP_PASSWORD must be set in infra/.env};TrustServerCertificate=True;Encrypt=True"
+      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY must be set in infra/.env}
+      JWT_ISSUER: ${JWT_ISSUER:?JWT_ISSUER must be set in infra/.env}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:?JWT_AUDIENCE must be set in infra/.env}
+      # Local stack only: Development enables the OpenAPI document and Scalar so reviewers can
+      # do the admin setup (docs/DECISIONS.md). A production deployment never runs as Development.
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "${API_HOST_PORT:-5080}:8080"
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # nginx: serves the Angular build and proxies /api to the api service (single origin, no CORS).
+  web:
+    build:
+      context: ../frontend
+    ports:
+      - "${WEB_HOST_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_started
     restart: unless-stopped
 
 volumes:
