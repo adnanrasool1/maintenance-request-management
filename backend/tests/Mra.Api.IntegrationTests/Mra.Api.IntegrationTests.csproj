@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mra.Api\Mra.Api.csproj" />
+    <ProjectReference Include="..\..\src\Mra.DbMigrator\Mra.DbMigrator.csproj" />
   </ItemGroup>
 
 </Project>
