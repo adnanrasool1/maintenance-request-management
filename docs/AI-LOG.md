@@ -1,8 +1,38 @@
 # AI Log
 
-**Status:** working notes. Plan task T12.3 condenses this into the one-page deliverable (what was delegated fully, with constraints, or done by hand; at least one real prompt; one plausible-but-wrong agent output and how it was caught).
+One page on how AI agents were used. The detailed notes for each task, including every agent mistake, follow under [Working notes](#working-notes).
 
-**Rules for entries** (from `CLAUDE.md`): one entry per task, with the task ID, the prompt or specification, what was delegated fully or under constraints and what the human did, and **every** agent mistake with how it was found. If nothing was corrected, say so and list what was checked. Never invent a mistake, and never leave one out.
+## How the work was split
+
+| | What |
+|---|---|
+| **By the human** | Wrote the PRD, architecture, plan, git rules, `CLAUDE.md` and the task-by-task process. Made every product and rule decision: the doc fixes (composite-FK scope, the overrun rule, Scalar in Docker, the cost cap), API contract decisions D-1 to D-7, the Development-only docs exception to "only login is anonymous", and declining the demo seed (D-1) and an HTTP-level test package. Read and approved the migration SQL. Restarted Docker when it crashed, and merged the PR that let the agent merge. |
+| **Delegated with tight constraints** | All feature code, built by parallel subagents in separate git worktrees, one per plan task. Each subagent got a written spec plus a shared rules file covering: the frozen contract; the non-negotiable rules in `CLAUDE.md`; "no new packages"; the exact files it may touch; byte-identical content for a file two lanes both needed (`ICurrentUser`); and "stop and report instead of retrying a blocked command". |
+| **Delegated fully** | Repository skeletons (solution, Angular app, compose file, setup scripts), the API contract draft, the web container, PR descriptions, and merge-conflict resolution in `plan.md`, `AI-LOG.md` and `Program.cs` (with a script that stops on anything unexpected). |
+| **Orchestrator (the lead agent)** | Planned the waves, reviewed every diff before merging, re-ran builds (and tests, until the human deferred them to the end), and opened and merged PRs under the human's temporary authorisation. |
+
+## A real prompt
+
+The human's kickoff instruction, verbatim:
+
+> now as you have full context of all documents and project. now start development. you need to follow all rules and architectural decision mentioned in the document. follow the plan document. … where ever you need any decision from me, then ask. otherwise continue with development. you'll be following this flow for development: plan -> architect as senior software architect -> develop as senior software engineer -> code-review -> apply patches -> create PR
+
+An excerpt of a subagent spec that the orchestrator wrote from it (T7, request workflow):
+
+> **T7.3** `GET /api/requests/{id:guid}` (policy `Requester`): 404 for other orgs (filter) **and** for another Requester's request (ownership rule in the handler; same `NotFoundException`). … **T7.5** … Load **with `Include(r => r.AuditEntries)`** (required by `Complete`) … A `rowversion` conflict must reach the handler → 409: don't catch it, don't retry.
+
+## Plausible but wrong: the mock backend shipped to production
+
+**What:** the frontend subagent first wired the mock API into `app.config.ts` behind a `useMocks` flag. It worked, the tests passed, and the production build called the real API, so it looked correct. But the mock module, with its fake users and the password `password`, was still bundled into the **production** JavaScript, because the import was unconditional.
+
+**How it was caught:** as part of its own review, the subagent searched the production bundle for a mock email and found it. It moved the mock import into the development-only environment file. The web-container task later checked the built image for mock data again.
+
+**Why it was easy to miss:** nothing failed. The app behaved correctly in both builds; the problem only shows if you inspect the shipped bundle, not the running app.
+
+Other real catches, all in the notes below:
+- `ValidationBehavior` shared one validation context, so later validators repeated earlier errors. A new unit test caught it.
+- nginx forwarded the `Host` header without its port. A stub API showed it.
+- The orchestrator itself started marking the API contract "approved and frozen" before the human had approved it. The harness blocked the edit; the orchestrator reverted it and asked.
 
 ---
 
@@ -22,7 +52,7 @@
 - **Agent:** `.gitignore`, `.editorconfig`, `.gitattributes` (LF for container scripts; proposed as a DECISIONS line), the PR template, and the folders.
 - **Agent mistake:** the `sed` command that ticked the plan boxes dropped a backtick (`` `backend/, `` instead of `` `backend/`, ``). It was plausible because the line still read correctly at a glance. It was found by reading `git diff` before committing, and fixed.
 
-### T0.2 Agent configuration (this PR)
+### T0.2 Agent configuration (PR #3)
 
 - **Prompt:** same as T0.1.
 - **Agent:** `.claude/settings.json` with the git-rules §9 deny list. **Constraint added:** the same rules are mirrored for the `PowerShell` tool, because this machine's primary shell is PowerShell and Bash-only rules wouldn't cover it. This file was also created.
@@ -162,6 +192,58 @@
 - **Bug found in merged code and fixed (own `fix(db)` commit, flagged in the PR):** the second `docker compose up` failed: the migrator exited 1 with `DuplicateEmailException`. T6.1 made `AppDbContext.SaveChangesAsync` translate the `UX_Users_Email` violation, so the migrator's `catch (DbUpdateException) when (IsDuplicateEmail…)` no longer matched, and after a `down` the API would never start again. The migrator now catches `DuplicateEmailException`. The existing `DatabaseInitializerTests` covers this but had not been run.
 - **Checked (running stack, project `mra-t5`, ports 14331/15080/18080):** migrator `Exited (0)` (migrations applied, `mra_app` created, System Admin seeded); api and web up; `POST /api/auth/login` through nginx → 200 with a token (wrong password → 401); `/scalar` → 302 to `/scalar/` → 200; `GET /` on web → 200. After the fix, two further `up` runs: migrator exit 0 ("database is up to date", "already exists; nothing seeded"), login still 200. T5.3: the api container's environment has only `ConnectionStrings__App` with `User Id=mra_app` and no `sa` or `MSSQL_SA_PASSWORD`; the migrator's has `ConnectionStrings__Owner` with `User Id=sa`; the API's database-backed login succeeded, which it can only do as `mra_app`. `dotnet build` 0 warnings / 0 errors. Stack removed with `down -v` and the local `infra/.env` deleted.
 - **Not verified:** a server-side `SELECT SUSER_NAME()`/`sys.dm_exec_sessions` check (the worktree guard refused the `sqlcmd` call inside the container, so it wasn't retried); a truly cold timing (the SQL Server image and the web build layers were already cached, so the measured 92 s `up --build` mostly reflects the backend image build and SDK/aspnet pulls); `dotnet test` (deferred by the human).
+
+### T10 Frontend integration (orchestrator)
+
+- **Spec:** switch off the mocks and smoke-test the full flow against the real API through nginx.
+- **Done:** the development build now uses the real API through `proxy.conf.json`; the production image never had the mock. The whole stack was started from `master` with `docker compose up --build`. A scripted smoke test then called the API **through nginx on :8080**, the browser's exact path, and ran 53 checks:
+  - both tenants' admin setup;
+  - threshold routing at the exact boundary (499.99 is auto-approved, 500 goes to pending);
+  - self-approval → 403, and a Requester approving → 403;
+  - a second decision → 409, and completing a rejected request → 409;
+  - cross-tenant request and site IDs → 404;
+  - a Requester reading another Requester's request → 404;
+  - the overrun flag in both directions (auto-approved vs manual);
+  - the spend report with a zero-spend site and the other tenant excluded;
+  - `from > to` → 400;
+  - a duplicate email in a different case → 400;
+  - the SPA deep link.
+- **Result:** 52 of 53 passed. The one "failure" was the smoke script's own assumption: the two login-failure bodies differ only in the per-request `traceId`. Status, title and detail are identical, so nothing reveals whether the email exists. Contract §4 allows `traceId` on any error, but §4.3 says "byte-for-byte the same", which is slightly too strong.
+- **Not verified:** a click-through in a real browser. The Chrome extension wasn't connected, so the smoke-test sub-item stays unticked. Dedicated UI test users were created for a manual run.
+
+### T11 Security and setup verification (orchestrator)
+
+- **Checked on `master`:**
+  - `IgnoreQueryFilters()` appears only in the login handler.
+  - `AllowAnonymous()` appears only on login and on the two Development-only docs endpoints (the approved exception).
+  - `git log --all` shows no `.env` ever tracked, and no real secret values in any commit (only `change-me` placeholders).
+  - `dotnet list package --vulnerable --include-transitive` is clean for all 7 projects, and `npm audit` reports 0 vulnerabilities.
+- **Not done:** a timed clean-machine run. The warm `docker compose up --build` took 22 s, and T5 measured 92 s with some layers cached. The SQL Server image download isn't included in either figure. Left unticked in the plan.
+- **Corrections:** none. The commands and their outputs are recorded in the T12 PR.
+
+### T12 Final deliverables (orchestrator)
+
+- **Spec:** finalise the README, DECISIONS (one page) and the AI-LOG summary, and check the commit history.
+- **Done:**
+  - **README:** run steps, an admin walkthrough in Scalar with example bodies, completion and report calls, a table mapping the brief's risks to tests, a Windows script-policy note, and the port and SSMS troubleshooting found during delivery.
+  - **DECISIONS:** a compact "made during delivery" table. It records the temporary merge authorisation honestly, and D-1 as declined.
+  - **AI-LOG:** a one-page summary above these notes.
+  - **History:** merge commits only, no squash, and every PR went through `master-dev` first.
+- **Agent mistakes during T12:**
+  - The first DECISIONS edit put the D-1 row after a blank line, outside its table. Caught by re-reading the diff.
+  - An inline `node -e` edit broke on an apostrophe in the shell quoting, and the resolver script was rewritten via a file. Both were caught before commit.
+
+### T9 Final test run (orchestrator)
+
+- **Prompt:** the human deferred all test runs to the end: "no need of running test: complete the task then we will run test at the end".
+- **Result on `master`:**
+  - Domain: 53/53.
+  - Frontend: 48/48.
+  - Integration, against Testcontainers SQL Server: 183/184 before the fix, 184/184 after.
+- **The one failure (plausible but wrong, found only because the tests finally ran):** T2's `Duplicate_email_violates_UX_Users_Email_across_organisations` expected a raw `DbUpdateException`. T6 later made `AppDbContext` translate that violation into `DuplicateEmailException`, as contract D-2 requires. Each lane built with 0 warnings, and each lane's tests were correct against the code on its own branch; the break only appeared after both merged. This is the same kind of cross-lane drift that T5 found in the migrator at runtime. Fixed by asserting the translated exception while still checking the inner `SqlException` 2601 names `UX_Users_Email`.
+- **Lesson:** deferring tests saved time, but let two cross-lane regressions reach `master` (the migrator at runtime, and this test). Both were caught before the review.
+- **Plan:** T9.2–T9.5 ticked. They are covered at handler and database level, plus the HTTP smoke test through nginx (T10). T9.1 stays unticked: its harness spec includes `WebApplicationFactory`, which wasn't added because the human chose to keep tests minimal and add no new package.
+
 - **Human manual check on the running stack (SSMS, Scalar and the web UI; done by hand, results as reported by the human):**
   - Created two organisations as the System Admin.
   - The System Admin trying to create a user inside an organisation was blocked (correct).
