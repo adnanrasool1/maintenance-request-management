@@ -27,3 +27,10 @@
 - **Prompt:** same as T0.1.
 - **Agent:** `.claude/settings.json` with the git-rules §9 deny list. **Constraint added:** the same rules are mirrored for the `PowerShell` tool, because this machine's primary shell is PowerShell and Bash-only rules wouldn't cover it. This file was also created.
 - **Corrections:** none. Checked: the JSON parses, and each deny rule matches one in git-rules §9 (19 rules × 2 tools).
+
+### T0.5 Infrastructure skeleton
+
+- **Prompt:** plan task T0.5, delegated to a sub-agent with a written spec: compose with only `sqlserver` (exact CU tag, `sqlcmd` health check with `-C`, named volume, sa password and host port from `.env`), `.env.example` with placeholders and the keys the architecture and README already name, and `setup.sh` / `setup.ps1` (PS 5.1) that generate random secrets only when `.env` is missing.
+- **Agent:** picked `mcr.microsoft.com/mssql/server:2022-CU27-ubuntu-22.04`, the newest `2022-CU*-ubuntu-22.04` tag in the MCR tag list on 2026-09-26. Wrote the three files. Passwords are 24 characters from `[A-Za-z0-9]` plus a guaranteed upper, lower, digit and one of `._!-`, so they meet SQL Server complexity and never contain `$`, quotes, `#` or `;`. The JWT key is 32 random bytes, base64. `setup.ps1` writes the file as UTF-8 without BOM and with LF endings.
+- **Constraint:** the Docker daemon was not running, so the container was **not** started and the health check was **not** exercised. Verified instead: `docker compose config` renders with `.env.example` and with a `.env` from each script; both scripts create `.env` with no `=change-me` left, correct password complexity and a 44-character key; a second run leaves the file unchanged (same hash); `git status --ignored` shows `infra/.env` as ignored; `git ls-files --eol` shows `setup.sh` LF and mode 100755.
+- **Agent mistake:** a `sed` command meant to replace `echo "$line"` with `printf '%s\n' "$line"` in `setup.sh` turned the `\n` into a real line break, splitting the `printf` string across two lines. The file-change notice showed the broken line; it was fixed with an exact edit before anything was committed or run.
