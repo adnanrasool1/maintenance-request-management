@@ -25,4 +25,13 @@ public sealed class Organisation
             ApprovalThreshold = approvalThreshold,
         };
     }
+
+    // Applies to requests raised from now on. Requests already pending or decided are not
+    // re-evaluated (FR-4.3).
+    public void SetApprovalThreshold(decimal approvalThreshold)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(approvalThreshold);
+
+        ApprovalThreshold = approvalThreshold;
+    }
 }

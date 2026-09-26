@@ -35,5 +35,7 @@ app.UseAuthorization();
 app.MapOpenApiInDevelopment();
 app.MapAuthEndpoints();
 app.MapReportsEndpoints();
+app.MapAdminEndpoints();
+app.MapSitesEndpoints();
 
 app.Run();
