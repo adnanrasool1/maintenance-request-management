@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mra.Application.Common.Exceptions;
+using Mra.Domain.Requests;
+using Mra.Infrastructure.Persistence;
 
 namespace Mra.Api.Errors;
 
@@ -18,23 +20,30 @@ public sealed class ProblemDetailsExceptionHandler(
     public const string NotFoundDetail = "The requested resource was not found.";
     public const string ConflictDetail = "The resource was changed by someone else. Reload it and try again.";
     public const string BadRequestDetail = "The request could not be read.";
+    public const string InvalidCredentialsDetail = "Invalid email or password.";
+    public const string SelfApprovalDetail = "You cannot approve or reject a request you raised.";
+    public const string InvalidTransitionDetail = "The request is not in a state that allows this action.";
 
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
         CancellationToken cancellationToken)
     {
-        // TODO(T1.7): map the domain exceptions when they land in Mra.Domain:
-        //   InvalidTransitionException -> 409 Conflict
-        //   SelfApprovalException      -> 403 Forbidden
         var problem = exception switch
         {
             ValidationException validation => CreateValidationProblem(validation),
+            // Same body for an unknown email and a wrong password (contract §4.3).
+            InvalidCredentialsException => new ProblemDetails { Status = StatusCodes.Status401Unauthorized, Detail = InvalidCredentialsDetail },
             NotFoundException => new ProblemDetails { Status = StatusCodes.Status404NotFound, Detail = NotFoundDetail },
             ForbiddenException forbidden => new ProblemDetails { Status = StatusCodes.Status403Forbidden, Detail = forbidden.Message },
+            SelfApprovalException => new ProblemDetails { Status = StatusCodes.Status403Forbidden, Detail = SelfApprovalDetail },
+            // Fixed detail: the exception message names the statuses, which the contract doesn't expose.
+            InvalidTransitionException => new ProblemDetails { Status = StatusCodes.Status409Conflict, Detail = InvalidTransitionDetail },
             DbUpdateConcurrencyException => new ProblemDetails { Status = StatusCodes.Status409Conflict, Detail = ConflictDetail },
             // Malformed JSON or an unbindable parameter (thrown in Development; ThrowOnBadRequest).
             BadHttpRequestException badRequest => new ProblemDetails { Status = badRequest.StatusCode, Detail = BadRequestDetail },
+            // A tenant-isolation or audit guard fired: always an application bug, never bad input.
+            TenantGuardException => null,
             // Anything else: a generic 500. The exception is logged, never returned to the client.
             _ => null,
         };
