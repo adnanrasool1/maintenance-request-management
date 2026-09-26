@@ -67,6 +67,12 @@ textarea {
 
 .toolbar select {
   width: auto;
+  margin-left: 0.5rem;
+}
+
+.toolbar label,
+.toolbar h2 {
+  margin: 0;
 }
 
 textarea {
