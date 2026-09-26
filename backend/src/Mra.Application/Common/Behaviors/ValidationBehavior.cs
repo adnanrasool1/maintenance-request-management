@@ -18,11 +18,12 @@ public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidat
         CancellationToken cancellationToken)
     {
         var failures = new List<ValidationFailure>();
-        var context = new ValidationContext<TRequest>(request);
 
         foreach (var validator in validators)
         {
-            var result = await validator.ValidateAsync(context, cancellationToken);
+            // A fresh context per validator: a ValidationContext accumulates failures, so sharing
+            // one would repeat the earlier validators' errors in every later result.
+            var result = await validator.ValidateAsync(new ValidationContext<TRequest>(request), cancellationToken);
             failures.AddRange(result.Errors);
         }
 
