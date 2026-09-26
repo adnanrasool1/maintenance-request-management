@@ -182,10 +182,10 @@ Every feature below consists of a command or query, a validator, a manual mapper
 
 ### Lane B — Containers (Dev 2, parallel with M2)
 
-- [ ] **T5 Full compose stack** · `chore/{date}/compose-stack`
-  - [ ] **T5.1** Add a multi-stage `backend/Dockerfile` with `api` and `migrator` targets.
-  - [ ] **T5.2** Update compose so services start in order: `sqlserver` (healthy) → `migrator` (completed successfully) → `api` → `web`.
-  - [ ] **T5.3** Confirm the API connects as `mra_app` and the migrator as the owner login, with credentials only from `.env`.
+- [X] **T5 Full compose stack** · `chore/{date}/compose-stack`
+  - [X] **T5.1** Add a multi-stage `backend/Dockerfile` with `api` and `migrator` targets.
+  - [X] **T5.2** Update compose so services start in order: `sqlserver` (healthy) → `migrator` (completed successfully) → `api` → `web`.
+  - [X] **T5.3** Confirm the API connects as `mra_app` and the migrator as the owner login, with credentials only from `.env`.
 
 ---
 

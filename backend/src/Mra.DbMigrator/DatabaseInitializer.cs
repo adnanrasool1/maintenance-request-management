@@ -1,6 +1,6 @@
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Mra.Application.Common.Abstractions;
+using Mra.Application.Common.Exceptions;
 using Mra.Domain.Users;
 using Mra.Infrastructure.Authentication;
 using Mra.Infrastructure.Persistence;
@@ -12,12 +12,6 @@ namespace Mra.DbMigrator;
 public static class DatabaseInitializer
 {
     public const string AppLogin = "mra_app";
-
-    // Name of the unique index on Users.Email (UserConfiguration.EmailIndexName, internal to Infrastructure).
-    private const string EmailIndexName = "UX_Users_Email";
-
-    private const int UniqueIndexViolation = 2601;
-    private const int UniqueConstraintViolation = 2627;
 
     // The identifiers are the fixed constants above, never input, so they are written bracketed.
     // DENY overrides the schema-wide GRANT (architecture §8). mra_app gets no DDL rights, no role
@@ -106,7 +100,8 @@ public static class DatabaseInitializer
 
         // The query filters hide every user from a caller with no organisation, and
         // IgnoreQueryFilters is not allowed here, so "already seeded" is detected by the unique
-        // email index instead of a lookup. The write guard allows the insert: the migrator has no
+        // email index instead of a lookup; AppDbContext translates that violation into
+        // DuplicateEmailException. The write guard allows the insert: the migrator has no
         // organisation, and the System Admin has none.
         await using var db = CreateContext(settings);
         db.Users.Add(admin);
@@ -116,15 +111,11 @@ public static class DatabaseInitializer
             await db.SaveChangesAsync(cancellationToken);
             await log.WriteLineAsync($"System Admin: seeded {settings.SystemAdminEmail}.");
         }
-        catch (DbUpdateException ex) when (IsDuplicateEmail(ex))
+        catch (DuplicateEmailException)
         {
             await log.WriteLineAsync($"System Admin: a user with email {settings.SystemAdminEmail} already exists; nothing seeded.");
         }
     }
-
-    private static bool IsDuplicateEmail(DbUpdateException ex) =>
-        ex.InnerException is SqlException { Number: UniqueIndexViolation or UniqueConstraintViolation } sqlError
-        && sqlError.Message.Contains(EmailIndexName, StringComparison.Ordinal);
 
     private static AppDbContext CreateContext(MigratorSettings settings)
     {
