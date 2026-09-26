@@ -74,9 +74,9 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
   - [ ] Add `Directory.Build.props`: nullable enabled, warnings as errors, NuGet audit on.
   - [ ] Add `Directory.Packages.props` with pinned versions: MediatR 12.5.0, FluentValidation, EF Core 10, xUnit, Testcontainers.
   - [ ] The empty solution builds and the empty test run passes.
-- [ ] **T0.4 Frontend skeleton** · `chore/{date}/frontend-skeleton`
-  - [ ] Create an Angular 22 app with standalone components and routing, and no UI library.
-  - [ ] Add `proxy.conf.json` so `/api` goes to the local API when using `ng serve`.
+- [X] **T0.4 Frontend skeleton** · `chore/{date}/frontend-skeleton`
+  - [X] Create an Angular 22 app with standalone components and routing, and no UI library.
+  - [X] Add `proxy.conf.json` so `/api` goes to the local API when using `ng serve`.
 - [ ] **T0.5 Infrastructure skeleton** · `chore/{date}/infra-skeleton`
   - [ ] Add `infra/docker-compose.yml` with the `sqlserver` service: pinned image, `sqlcmd` health check, named volume.
   - [ ] Add `infra/.env.example` with placeholder values only.
