@@ -98,6 +98,57 @@ public sealed class MaintenanceRequest
         return request;
     }
 
+    /// <summary>
+    /// Manually approves a pending request (FR-3, FR-3.4) and snapshots
+    /// <paramref name="currentThreshold"/>, the organisation's threshold in force now (FR-4.2).
+    /// The role check (Approver only) is the endpoint policy's job, not the domain's.
+    /// </summary>
+    /// <exception cref="SelfApprovalException">The actor raised this request (checked first).</exception>
+    /// <exception cref="InvalidTransitionException">The request is not pending approval.</exception>
+    public void Approve(Guid actorUserId, decimal currentThreshold, string? comment, DateTime now)
+    {
+        EnsureNotSelfDecision(actorUserId);
+        ArgumentOutOfRangeException.ThrowIfNegative(currentThreshold);
+        EnsureCommentLength(comment);
+
+        TransitionTo(RequestStatus.Approved, actorUserId, AuditActions.Approved, NormaliseComment(comment), now);
+        ThresholdAtDecision = currentThreshold;
+    }
+
+    /// <summary>
+    /// Rejects a pending request (FR-3, FR-3.4). <see cref="ThresholdAtDecision"/> stays null.
+    /// The role check (Approver only) is the endpoint policy's job, not the domain's.
+    /// </summary>
+    /// <exception cref="SelfApprovalException">The actor raised this request (checked first).</exception>
+    /// <exception cref="InvalidTransitionException">The request is not pending approval.</exception>
+    public void Reject(Guid actorUserId, string? comment, DateTime now)
+    {
+        EnsureNotSelfDecision(actorUserId);
+        EnsureCommentLength(comment);
+
+        TransitionTo(RequestStatus.Rejected, actorUserId, AuditActions.Rejected, NormaliseComment(comment), now);
+    }
+
+    private void EnsureNotSelfDecision(Guid actorUserId)
+    {
+        EnsureNotEmpty(actorUserId, nameof(actorUserId));
+        if (actorUserId == RaisedByUserId)
+        {
+            throw new SelfApprovalException();
+        }
+    }
+
+    private static void EnsureCommentLength(string? comment)
+    {
+        if (comment is { Length: > MaxCommentLength })
+        {
+            throw new ArgumentException($"The comment must be at most {MaxCommentLength} characters.", nameof(comment));
+        }
+    }
+
+    private static string? NormaliseComment(string? comment) =>
+        string.IsNullOrWhiteSpace(comment) ? null : comment;
+
     // The only place Status changes after creation: the table decides legality, then the
     // change and its audit entry are applied together.
     private void TransitionTo(RequestStatus to, Guid? actorUserId, string action, string? comment, DateTime now)
