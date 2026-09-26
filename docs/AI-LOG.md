@@ -204,3 +204,25 @@ Other real catches, all in the notes below:
   - the SPA deep link.
 - **Result:** 52 of 53 passed. The one "failure" was the smoke script's own assumption: the two login-failure bodies differ only in the per-request `traceId`. Status, title and detail are identical, so nothing reveals whether the email exists. Contract §4 allows `traceId` on any error, but §4.3 says "byte-for-byte the same", which is slightly too strong.
 - **Not verified:** a click-through in a real browser. The Chrome extension wasn't connected, so the smoke-test sub-item stays unticked. Dedicated UI test users were created for a manual run.
+
+### T11 Security and setup verification (orchestrator)
+
+- **Checked on `master`:**
+  - `IgnoreQueryFilters()` appears only in the login handler.
+  - `AllowAnonymous()` appears only on login and on the two Development-only docs endpoints (the approved exception).
+  - `git log --all` shows no `.env` ever tracked, and no real secret values in any commit (only `change-me` placeholders).
+  - `dotnet list package --vulnerable --include-transitive` is clean for all 7 projects, and `npm audit` reports 0 vulnerabilities.
+- **Not done:** a timed clean-machine run. The warm `docker compose up --build` took 22 s, and T5 measured 92 s with some layers cached. The SQL Server image download isn't included in either figure. Left unticked in the plan.
+- **Corrections:** none. The commands and their outputs are recorded in the T12 PR.
+
+### T12 Final deliverables (orchestrator)
+
+- **Spec:** finalise the README, DECISIONS (one page) and the AI-LOG summary, and check the commit history.
+- **Done:**
+  - **README:** run steps, an admin walkthrough in Scalar with example bodies, completion and report calls, a table mapping the brief's risks to tests, a Windows script-policy note, and the port and SSMS troubleshooting found during delivery.
+  - **DECISIONS:** a compact "made during delivery" table. It records the temporary merge authorisation honestly, and D-1 as declined.
+  - **AI-LOG:** a one-page summary above these notes.
+  - **History:** merge commits only, no squash, and every PR went through `master-dev` first.
+- **Agent mistakes during T12:**
+  - The first DECISIONS edit put the D-1 row after a blank line, outside its table. Caught by re-reading the diff.
+  - An inline `node -e` edit broke on an apostrophe in the shell quoting, and the resolver script was rewritten via a file. Both were caught before commit.
