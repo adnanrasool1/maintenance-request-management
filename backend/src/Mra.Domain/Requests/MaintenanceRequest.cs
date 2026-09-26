@@ -3,8 +3,9 @@ using System.Globalization;
 namespace Mra.Domain.Requests;
 
 // Aggregate root for the workflow (architecture §4.1). Status changes only through the methods
-// below; each one checks RequestTransitions and appends exactly one AuditEntry. All times passed
-// in are expected to be UTC (from TimeProvider).
+// below. Every transition is checked against RequestTransitions and appends exactly one
+// AuditEntry; Raise also records the creation itself, so it appends two. All times passed in are
+// expected to be UTC (from TimeProvider).
 public sealed class MaintenanceRequest
 {
     public const int MaxDescriptionLength = 2000;
