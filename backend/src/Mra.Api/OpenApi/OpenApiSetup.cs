@@ -31,8 +31,11 @@ public static class OpenApiSetup
     {
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
-            app.MapScalarApiReference();
+            // The only anonymous endpoints besides login (stakeholder-approved exception, DECISIONS):
+            // the docs themselves must load in a browser. Every API call made from Scalar still
+            // needs a bearer token. Never mapped outside Development.
+            app.MapOpenApi().AllowAnonymous();
+            app.MapScalarApiReference().AllowAnonymous();
         }
 
         return app;
