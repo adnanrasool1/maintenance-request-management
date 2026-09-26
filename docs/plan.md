@@ -123,10 +123,10 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
     - blocks cross-tenant writes
     - blocks modifying or deleting any `AuditEntry`
   - [X] **T2.7** Add the initial migration. **A human reads the generated SQL** before the PR is raised.
-- [ ] **T2.8 DbMigrator** · `feat/{date}/db-migrator`
-  - [ ] Apply migrations using the owner login.
-  - [ ] Idempotently create the `mra_app` login and user, then add the grants and **`DENY UPDATE, DELETE ON AuditEntries`**.
-  - [ ] Idempotently seed the System Admin from environment variables.
+- [X] **T2.8 DbMigrator** · `feat/{date}/db-migrator`
+  - [X] Apply migrations using the owner login.
+  - [X] Idempotently create the `mra_app` login and user, then add the grants and **`DENY UPDATE, DELETE ON AuditEntries`**.
+  - [X] Idempotently seed the System Admin from environment variables.
 
 ### Lane C — Auth and API plumbing (Dev 3)
 
