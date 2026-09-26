@@ -75,7 +75,18 @@ public sealed class ProblemDetailsExceptionHandlerTests
         Assert.False(body.TryGetProperty("detail", out _));
     }
 
-    private static async Task<(int Status, string? ContentType, JsonElement Body)> HandleAsync(Exception exception)
+    [Fact]
+    public async Task Status_is_kept_when_the_client_does_not_accept_json()
+    {
+        var (status, contentType, body) = await HandleAsync(new NotFoundException(), accept: "text/html");
+
+        Assert.Equal(404, status);
+        Assert.StartsWith("application/problem+json", contentType);
+        Assert.Equal("The requested resource was not found.", body.GetProperty("detail").GetString());
+    }
+
+    private static async Task<(int Status, string? ContentType, JsonElement Body)> HandleAsync(
+        Exception exception, string? accept = null)
     {
         var services = new ServiceCollection()
             .AddLogging()
@@ -84,6 +95,10 @@ public sealed class ProblemDetailsExceptionHandlerTests
 
         var httpContext = new DefaultHttpContext { RequestServices = services };
         httpContext.Response.Body = new MemoryStream();
+        if (accept is not null)
+        {
+            httpContext.Request.Headers.Accept = accept;
+        }
 
         var handler = new ProblemDetailsExceptionHandler(
             services.GetRequiredService<IProblemDetailsService>(),

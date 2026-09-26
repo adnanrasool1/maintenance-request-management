@@ -48,12 +48,22 @@ public sealed class ProblemDetailsExceptionHandler(
 
         httpContext.Response.StatusCode = problem.Status!.Value;
 
-        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+        var written = await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             ProblemDetails = problem,
             // Not passing the exception keeps it out of any customisation that could echo it.
         });
+
+        // The default writer declines when the Accept header excludes JSON. Returning false would
+        // let the middleware reset the response to a 500, so write the problem directly instead.
+        if (!written)
+        {
+            await httpContext.Response.WriteAsJsonAsync(
+                problem, problem.GetType(), options: null, contentType: "application/problem+json", cancellationToken);
+        }
+
+        return true;
     }
 
     private static HttpValidationProblemDetails CreateValidationProblem(ValidationException exception)
