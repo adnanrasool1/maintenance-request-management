@@ -10,6 +10,15 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
   </ItemGroup>
 
+  <ItemGroup Label="Auth">
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup Label="API docs (Development only)">
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.17.10" />
+  </ItemGroup>
+
   <ItemGroup Label="Data">
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12" />
