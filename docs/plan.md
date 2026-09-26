@@ -123,10 +123,10 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
     - blocks cross-tenant writes
     - blocks modifying or deleting any `AuditEntry`
   - [X] **T2.7** Add the initial migration. **A human reads the generated SQL** before the PR is raised.
-- [ ] **T2.8 DbMigrator** · `feat/{date}/db-migrator`
-  - [ ] Apply migrations using the owner login.
-  - [ ] Idempotently create the `mra_app` login and user, then add the grants and **`DENY UPDATE, DELETE ON AuditEntries`**.
-  - [ ] Idempotently seed the System Admin from environment variables.
+- [X] **T2.8 DbMigrator** · `feat/{date}/db-migrator`
+  - [X] Apply migrations using the owner login.
+  - [X] Idempotently create the `mra_app` login and user, then add the grants and **`DENY UPDATE, DELETE ON AuditEntries`**.
+  - [X] Idempotently seed the System Admin from environment variables.
 
 ### Lane C — Auth and API plumbing (Dev 3)
 
@@ -148,9 +148,9 @@ Owner: Dev 2 leads. T0.3, T0.4 and T0.5 can run in parallel once T0.1 is merged.
   - [X] **T4.4** Add the request list page, with a status filter for Approvers.
   - [X] **T4.5** Add the create request page, with a site dropdown and form validation that mirrors the server rules.
   - [X] **T4.6** Add the request detail page. Approve and Reject are shown only to Approvers on pending requests that aren't their own; this is for the user experience only, since the server enforces the rules.
-- [ ] **T4.7 Web container** · `chore/{date}/web-container`
-  - [ ] Add a multi-stage `frontend/Dockerfile` (Node build, then nginx).
-  - [ ] Add `nginx.conf`: SPA fallback, proxy `/api` to `api:8080`, and security headers (CSP, `nosniff`, `Referrer-Policy`).
+- [X] **T4.7 Web container** · `chore/{date}/web-container`
+  - [X] Add a multi-stage `frontend/Dockerfile` (Node build, then nginx).
+  - [X] Add `nginx.conf`: SPA fallback, proxy `/api` to `api:8080`, and security headers (CSP, `nosniff`, `Referrer-Policy`).
 
 ---
 
